@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Shamash — Безопасность объекта</title>
+  <link rel="icon" href="data:,">
+  <style>
+    html, body, #root { margin: 0; padding: 0; min-height: 100%; }
+    body { -webkit-tap-highlight-color: transparent; }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div style="display:flex; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; color:#666;">
+      Загрузка Shamash...
+    </div>
+  </div>
+
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+
+  <!-- Firebase (только App + Firestore, версия compat — самая простая в подключении) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    // ====== Настройки Firebase — данные проекта Avram (shamash-fe974) ======
+    const firebaseConfig = {
+      apiKey: "AIzaSyDt2UfJF4AxmFj-HVZAfCT85YbCkdFF9B0",
+      authDomain: "shamash-fe974.firebaseapp.com",
+      projectId: "shamash-fe974",
+      storageBucket: "shamash-fe974.firebasestorage.app",
+      messagingSenderId: "767919179340",
+      appId: "1:767919179340:web:cad22ddf74af4cb6a7d6e9",
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const COLLECTION = "shamash_data";
+
+    // ====== "Шим" — делает window.storage совместимым с тем, что ожидает приложение ======
+    window.storage = {
+      async set(key, value, shared) {
+        try {
+          await db.collection(COLLECTION).doc(key).set({ value, updated: Date.now() });
+          return { key, value, shared: !!shared };
+        } catch (e) {
+          console.error("storage.set error", e);
+          return null;
+        }
+      },
+      async get(key, shared) {
+        const snap = await db.collection(COLLECTION).doc(key).get();
+        if (!snap.exists) {
+          throw new Error("Key not found: " + key);
+        }
+        const data = snap.data();
+        return { key, value: data.value, shared: !!shared };
+      },
+      async delete(key, shared) {
+        try {
+          await db.collection(COLLECTION).doc(key).delete();
+          return { key, deleted: true, shared: !!shared };
+        } catch (e) {
+          console.error("storage.delete error", e);
+          return null;
+        }
+      },
+      async list(prefix, shared) {
+        try {
+          let query = db.collection(COLLECTION);
+          if (prefix) {
+            query = query
+              .orderBy(firebase.firestore.FieldPath.documentId())
+              .startAt(prefix)
+              .endAt(prefix + "\uf8ff");
+          }
+          const snap = await query.get();
+          const keys = [];
+          snap.forEach((doc) => keys.push(doc.id));
+          return { keys, prefix, shared: !!shared };
+        } catch (e) {
+          console.error("storage.list error", e);
+          return { keys: [], prefix, shared: !!shared };
+        }
+      },
+    };
+  </script>
+
+  <!-- Само приложение (скомпилировано из React/JSX) -->
+  <script src="app.js"></script>
+</body>
+</html>
