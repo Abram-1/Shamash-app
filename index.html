@@ -1,5 +1,4 @@
-
-<!DOCTYPE html>h-app
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -8,6 +7,75 @@
 </head>
 <body>
   <div id="root"></div>
-  <script src="app.js?v=2" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+  <script>
+    (function () {
+      if (window.storage) return;
+      var P = "shamash:";
+      function ok(v) { return Promise.resolve(v); }
+      window.storage = {
+        get: function (k) {
+          return new Promise(function (res, rej) {
+            try {
+              var v = localStorage.getItem(P + k);
+              if (v === null) rej(new Error("not found"));
+              else res({ key: k, value: v });
+            } catch (e) { rej(e); }
+          });
+        },
+        set: function (k, v) {
+          try { localStorage.setItem(P + k, v); return ok({ key: k, value: v }); }
+          catch (e) { return Promise.reject(e); }
+        },
+        delete: function (k) {
+          try { localStorage.removeItem(P + k); return ok({ key: k, deleted: true }); }
+          catch (e) { return Promise.reject(e); }
+        },
+        list: function (prefix) {
+          var keys = [];
+          try {
+            for (var i = 0; i < localStorage.length; i++) {
+              var key = localStorage.key(i);
+              if (key.indexOf(P + (prefix || "")) === 0) keys.push(key.slice(P.length));
+            }
+          } catch (e) {}
+          return ok({ keys: keys, prefix: prefix });
+        }
+      };
+    })();
+
+    window.__jsxDEV = function (type, props, key) {
+      var p = {};
+      for (var k in props) p[k] = props[k];
+      if (key !== undefined) p.key = key;
+      return React.createElement(type, p);
+    };
+
+    function showError(msg) {
+      var r = document.getElementById("root");
+      if (r && !r.children.length) {
+        r.innerHTML = '<pre dir="ltr" style="white-space:pre-wrap;padding:16px;font-size:14px;color:#b00020">' +
+          String(msg).replace(/</g, "&lt;") + '</pre>';
+      }
+    }
+    window.addEventListener("error", function (e) { showError(e.message); });
+    fetch("app.js?v=4")
+      .then(function (r) {
+        if (!r.ok) throw new Error("app.js: " + r.status);
+        return r.text();
+      })
+      .then(function (src) {
+        src = src.replace(
+          /import\s*\{[^}]*\}\s*from\s*["']react\/jsx-dev-runtime["'];?/,
+          "var _jsxDEV=window.__jsxDEV,_Fragment=React.Fragment;"
+        );
+        var s = document.createElement("script");
+        s.text = src;
+        document.body.appendChild(s);
+      })
+      .catch(function (e) { showError(e.message); });
+  </script>
 </body>
-</html> 
+</html>
+
