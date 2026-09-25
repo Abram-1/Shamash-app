@@ -1,0 +1,139 @@
+{
+  "schema_version": "0.1",
+  "entities": {
+    "project": {
+      "id": "project_...",
+      "name": "",
+      "client": "",
+      "location": "",
+      "contract_type": "",
+      "start_date": null,
+      "planned_end_date": null,
+      "status": "active"
+    },
+    "object": {
+      "id": "object_...",
+      "project_id": "project_...",
+      "parent_object_id": null,
+      "type": "building",
+      "name": "",
+      "code": "",
+      "level": null,
+      "zone": null
+    },
+    "decision": {
+      "id": "decision_...",
+      "project_id": "project_...",
+      "object_id": null,
+      "text": "",
+      "source": "meeting|whatsapp|email|voice|site|document|ai",
+      "source_ref": null,
+      "decision_status": "proposed|approved|rejected|superseded",
+      "decided_by": null,
+      "decided_at": null,
+      "supersedes_id": null
+    },
+    "task": {
+      "id": "task_...",
+      "project_id": "project_...",
+      "object_id": null,
+      "work_package_id": null,
+      "title": "",
+      "description": "",
+      "responsible_person_id": null,
+      "planned_start": null,
+      "planned_finish": null,
+      "actual_start": null,
+      "actual_finish": null,
+      "status": "planned|in_progress|blocked|done|cancelled",
+      "priority": "low|normal|high|critical"
+    },
+    "work_progress": {
+      "id": "progress_...",
+      "task_id": "task_...",
+      "date": "",
+      "quantity_planned": null,
+      "quantity_actual": null,
+      "unit": "",
+      "percent_complete": null,
+      "crew_id": null,
+      "note": "",
+      "evidence_ids": []
+    },
+    "material_event": {
+      "id": "material_...",
+      "project_id": "project_...",
+      "material_name": "",
+      "event_type": "ordered|delivered|received|consumed|returned|wasted",
+      "quantity": null,
+      "unit": "",
+      "supplier": "",
+      "document_id": null,
+      "date": ""
+    },
+    "money_event": {
+      "id": "money_...",
+      "project_id": "project_...",
+      "type": "budget|commitment|invoice|payment|receipt|forecast",
+      "amount": null,
+      "currency": "ILS",
+      "vendor_or_party": "",
+      "document_id": null,
+      "date": ""
+    },
+    "document": {
+      "id": "doc_...",
+      "project_id": "project_...",
+      "object_id": null,
+      "type": "drawing|contract|specification|protocol|invoice|permit|photo|other",
+      "title": "",
+      "revision": null,
+      "source": "",
+      "file_ref": "",
+      "date": ""
+    },
+    "evidence": {
+      "id": "evidence_...",
+      "project_id": "project_...",
+      "type": "photo|video|audio|document|message",
+      "file_ref": "",
+      "captured_at": "",
+      "description": "",
+      "tags": []
+    },
+    "quality_issue": {
+      "id": "quality_...",
+      "project_id": "project_...",
+      "object_id": null,
+      "title": "",
+      "description": "",
+      "severity": "low|medium|high|critical",
+      "status": "open|assigned|fixed|verified|closed",
+      "responsible_person_id": null,
+      "evidence_ids": [],
+      "estimated_cost": null,
+      "confirmed_cost": null
+    },
+    "safety_observation": {
+      "id": "safety_...",
+      "project_id": "project_...",
+      "object_id": null,
+      "observation": "",
+      "hazard_level": "low|medium|high|critical",
+      "action": "",
+      "status": "observed|warned|controlled|closed",
+      "evidence_ids": []
+    },
+    "early_warning": {
+      "id": "warning_...",
+      "project_id": "project_...",
+      "trigger_type": "schedule|quality|safety|money|material|document|resource",
+      "observation_id": null,
+      "analysis": "",
+      "warning": "",
+      "human_decision": null,
+      "result": null,
+      "status": "new|reviewed|accepted|rejected|resolved"
+    }
+  }
+}
