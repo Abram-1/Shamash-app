@@ -36,6 +36,7 @@ input,textarea,select{width:100%;padding:10px;border:1px solid #cfd5da;border-ra
 <button data-tab="materials">📦 Материалы</button>
 <button data-tab="money">₪ Деньги</button>
 <button data-tab="quality">✅ Качество</button>
+<button data-tab="protocols">📑 Протоколы проверки</button>
 <button data-tab="safety">🦺 Безопасность</button>
 <button data-tab="warnings">⚠️ Ранние предупреждения</button>
 </nav>
@@ -44,8 +45,8 @@ input,textarea,select{width:100%;padding:10px;border:1px solid #cfd5da;border-ra
 </div>
 <script>
 const KEY='shamash_orchestrator_v01';
-const blank={projects:[],records:[],tasks:[],materials:[],money:[],quality:[],safety:[],warnings:[],plans:[]};
-let db=JSON.parse(localStorage.getItem(KEY)||'null')||blank; db.plans=db.plans||[];
+const blank={projects:[],records:[],tasks:[],materials:[],money:[],quality:[],protocols:[],safety:[],warnings:[],plans:[]};
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||blank; db.plans=db.plans||[]; db.protocols=db.protocols||[];
 function save(){localStorage.setItem(KEY,JSON.stringify(db));render(current)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 let current='dashboard';
@@ -62,6 +63,28 @@ function memory(){
  shell('Последние записи', '<div class="list">'+(db.records.slice().reverse().slice(0,10).map(r=>'<div class="item"><b>'+esc(r.type)+'</b> <span class="tag">'+esc(r.source)+'</span><div style="margin-top:6px">'+esc(r.text)+'</div><div class="muted" style="margin-top:6px;font-size:11px">'+new Date(r.at).toLocaleString()+'</div></div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>');
 }
 function addRecord(){db.records.push({id:crypto.randomUUID(),type:document.getElementById('rtype').value,source:document.getElementById('rsource').value,text:document.getElementById('rtext').value,at:new Date().toISOString(),project_id:project()?.id||null});save()}
+function protocols(){
+ return shell('Протоколы проверки · ответ по каждому замечанию',
+ '<div class="muted" style="margin-bottom:12px">SHAMASH сохраняет формулировку проверяющего отдельно от анализа и предлагает обоснованный ответ. Нормативный вывод не считается окончательным без проверки источника и, при необходимости, специалиста.</div>'+
+ '<div class="row"><div><label>№ протокола</label><input id="prnum" placeholder="P-2026-09-01"></div><div><label>Проверяющий</label><input id="prinsp" placeholder="שם / חברה"></div></div>'+
+ '<div class="row" style="margin-top:10px"><div><label>Объект / место</label><input id="prloc" placeholder="בניין 10 · דירה 7 · חזית"></div><div><label>Дата</label><input id="prdate" type="date"></div></div>'+
+ '<label style="margin-top:12px">Точная формулировка замечания</label><textarea id="prfinding" placeholder="Вставьте замечание проверяющего без изменений"></textarea>'+
+ '<div class="row" style="margin-top:10px"><div><label>На что ссылается проверяющий</label><input id="prsource" placeholder="תקנה / ת״י / מפרט / תוכנית / סעיף"></div><div><label>Класс ответа</label><select id="prclass"><option value="accepted">Принимаем</option><option value="clarify">Принимаем с уточнением</option><option value="partial">Частично принимаем</option><option value="disputed">Оспариваем</option><option value="na">Не применяется</option><option value="verify">Требует проверки специалистом</option></select></div></div>'+
+ '<label style="margin-top:12px">Фактическая позиция / что сделано</label><textarea id="prfact" placeholder="Что реально выполнено, когда и по какому чертежу"></textarea>'+
+ '<label style="margin-top:12px">Предлагаемый ответ</label><textarea id="pranswer" placeholder="SHAMASH использует это как черновик и основу для окончательного ответа"></textarea>'+
+ '<label style="margin-top:12px">Доказательства</label><input id="previdence" placeholder="Фото, акт, измерение, протокол лаборатории, чертеж...">'+
+ '<button class="btn" onclick="addProtocol()">Сохранить замечание</button>')+
+ shell('Замечания и ответы','<div class="list">'+(db.protocols.slice().reverse().map(p=>{
+   const cls={accepted:'Принимаем',clarify:'Уточнение',partial:'Частично',disputed:'Оспариваем',na:'Не применяется',verify:'Проверка специалистом'}[p.class]||p.class;
+   return '<div class="item"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+esc(p.number)+' · '+esc(p.location||'')+'</b><span class="tag">'+cls+'</span></div><div style="margin-top:7px"><b>Замечание:</b> '+esc(p.finding)+'</div>'+(p.source?'<div class="muted" style="margin-top:5px">Источник проверяющего: '+esc(p.source)+'</div>':'')+'<div style="margin-top:7px"><b>Факт:</b> '+esc(p.fact||'')+'</div><div style="margin-top:7px"><b>Черновик ответа:</b> '+esc(p.answer||'')+'</div>'+(p.evidence?'<div class="muted" style="margin-top:5px">Доказательства: '+esc(p.evidence)+'</div>':'')+'</div>'
+ }).join('')||'<div class="muted">Пока нет замечаний.</div>')+'</div>');
+}
+function addProtocol(){
+ const finding=document.getElementById('prfinding').value.trim();
+ if(!finding){alert('Введите формулировку замечания.');return}
+ db.protocols.push({id:crypto.randomUUID(),project_id:project()?.id||null,number:document.getElementById('prnum').value.trim()||'Без номера',inspector:document.getElementById('prinsp').value.trim(),location:document.getElementById('prloc').value.trim(),date:document.getElementById('prdate').value,source:document.getElementById('prsource').value.trim(),class:document.getElementById('prclass').value,finding,fact:document.getElementById('prfact').value.trim(),answer:document.getElementById('pranswer').value.trim(),evidence:document.getElementById('previdence').value.trim(),at:new Date().toISOString()});
+ save();
+}
 function planning(){
  return shell('Планирование · WBS / Gantt',
  '<div class="muted" style="margin-bottom:12px">План формируется по этапам и работам. SHAMASH будет сравнивать план, факт, зависимости, ресурсы и задержки.</div>'+
@@ -105,7 +128,7 @@ function generic(key,title,fields){return shell(title,'<div class="row">'+fields
 function addGeneric(key){let o={id:crypto.randomUUID()}; document.querySelectorAll('#main input').forEach(i=>{if(i.id)o[i.id]=i.value});o.project_id=project()?.id||null;o.at=new Date().toISOString();db[key].push(o);save()}
 function projectSetup(){return shell('Новый проект',project()?'<div><b>'+esc(project().name)+'</b></div><div class="muted">'+esc(project().location||'')+'</div>':'<div><label>Название</label><input id="pn" placeholder="Например: Явне, Ha-Dror 10–12"></div><div style="margin-top:10px"><label>Местоположение</label><input id="pl" placeholder="Yavne, Israel"></div><button class="btn" onclick="createProject()">Создать проект</button>')}
 function createProject(){db.projects=[{id:crypto.randomUUID(),name:document.getElementById('pn').value,location:document.getElementById('pl').value,status:'active'}];save()}
-function render(tab){current=tab;document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));let h='';if(tab==='dashboard')h=dashboard()+projectSetup();if(tab==='planning')h=planning();if(tab==='memory')h=memory();if(tab==='tasks')h=tasks();if(tab==='materials')h=generic('materials','Материалы',[{id:'material_name',label:'Материал',ph:'Бетон / блоки / окна...'},{id:'event',label:'Событие',ph:'заказан / получен / израсходован'}]);if(tab==='money')h=generic('money','Деньги',[{id:'type',label:'Тип',ph:'счёт / оплата / прогноз'},{id:'amount',label:'Сумма, ₪',ph:'0'}]);if(tab==='quality')h=generic('quality','Качество',[{id:'title',label:'Дефект / замечание',ph:'Что обнаружено'},{id:'severity',label:'Приоритет',ph:'low / medium / high / critical'}]);if(tab==='safety')h=generic('safety','Безопасность',[{id:'observation',label:'Наблюдение',ph:'Что обнаружено на объекте'},{id:'hazard_level',label:'Уровень',ph:'low / medium / high / critical'}]);if(tab==='warnings')h=generic('warnings','Раннее предупреждение',[{id:'trigger_type',label:'Причина',ph:'schedule / quality / safety / money...'},{id:'warning',label:'Предупреждение',ph:'Что требует внимания'}]);document.getElementById('main').innerHTML=h}
+function render(tab){current=tab;document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));let h='';if(tab==='dashboard')h=dashboard()+projectSetup();if(tab==='planning')h=planning();if(tab==='protocols')h=protocols();if(tab==='memory')h=memory();if(tab==='tasks')h=tasks();if(tab==='materials')h=generic('materials','Материалы',[{id:'material_name',label:'Материал',ph:'Бетон / блоки / окна...'},{id:'event',label:'Событие',ph:'заказан / получен / израсходован'}]);if(tab==='money')h=generic('money','Деньги',[{id:'type',label:'Тип',ph:'счёт / оплата / прогноз'},{id:'amount',label:'Сумма, ₪',ph:'0'}]);if(tab==='quality')h=generic('quality','Качество',[{id:'title',label:'Дефект / замечание',ph:'Что обнаружено'},{id:'severity',label:'Приоритет',ph:'low / medium / high / critical'}]);if(tab==='safety')h=generic('safety','Безопасность',[{id:'observation',label:'Наблюдение',ph:'Что обнаружено на объекте'},{id:'hazard_level',label:'Уровень',ph:'low / medium / high / critical'}]);if(tab==='warnings')h=generic('warnings','Раннее предупреждение',[{id:'trigger_type',label:'Причина',ph:'schedule / quality / safety / money...'},{id:'warning',label:'Предупреждение',ph:'Что требует внимания'}]);document.getElementById('main').innerHTML=h}
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>render(b.dataset.tab));render('dashboard');
 </script>
 </body>
