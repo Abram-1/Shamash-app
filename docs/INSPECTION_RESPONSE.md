@@ -70,3 +70,21 @@ The final protocol response should be bilingual-ready (Hebrew/Russian), preserve
 - responsible person;
 - target date;
 - closure verification.
+
+
+## Cost assessment
+Inspection protocols may contain monetary valuations for unfinished, defective, or corrective work. SHAMASH stores two figures separately:
+- **Inspector's stated amount** — exactly as received, with currency and source.
+- **SHAMASH calculation** — quantity × unit price, with currency, VAT when applicable, and price source.
+
+The system must preserve the inspector's figure without treating it as an established debt or accepted price. A SHAMASH calculation is a working estimate unless supported by an applicable contractual price list, bill of quantities, approved quotation, documented market source, or other appropriate evidence.
+
+For a protocol with multiple findings, SHAMASH should calculate:
+- subtotal per finding;
+- total inspector-stated amount;
+- total SHAMASH-estimated amount by currency;
+- differences between the figures;
+- items with missing quantity/unit price/source;
+- items requiring commercial, quantity-surveyor, legal, or technical verification.
+
+Different currencies must not be silently added together. Currency conversion, when required, must record the exchange-rate date and source.
