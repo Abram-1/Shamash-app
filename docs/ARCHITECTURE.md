@@ -14,7 +14,7 @@ SHAMASH may recommend, calculate, compare, warn, and prepare actions. Human appr
 
 ## First modules
 1. Project Memory
-2. Calendar / WBS / Gantt
+2. Calendar / WBS / Gantt — planning is a first-class management module: work breakdown, dependencies, planned dates, actual progress, responsible resources, and schedule-vs-fact comparison
 3. Work execution
 4. Materials and logistics
 5. Money / budget / payments
