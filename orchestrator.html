@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SHAMASH — Строительный оркестратор</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#eef0f2;color:#17202a}
+header{background:#141a20;color:#fff;padding:18px 20px;position:sticky;top:0;z-index:10}
+.brand{font-size:26px;font-weight:900;letter-spacing:2px}.sub{opacity:.72;font-size:13px;margin-top:4px}
+.wrap{max-width:1100px;margin:auto;padding:20px}
+.grid{display:grid;grid-template-columns:240px 1fr;gap:18px}
+nav{background:#fff;border-radius:14px;padding:10px;height:max-content;box-shadow:0 3px 14px rgba(0,0,0,.06)}
+nav button{width:100%;border:0;background:transparent;padding:12px;text-align:left;border-radius:9px;cursor:pointer;font-size:14px}
+nav button.active,nav button:hover{background:#f2b705;font-weight:800}
+.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 3px 14px rgba(0,0,0,.06)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{padding:15px;border:1px solid #e5e7eb;border-radius:12px}.num{font-size:28px;font-weight:900}.lab{font-size:12px;opacity:.62}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{font-size:12px;opacity:.65;display:block;margin-bottom:4px}
+input,textarea,select{width:100%;padding:10px;border:1px solid #cfd5da;border-radius:9px;font:inherit}textarea{min-height:90px;resize:vertical}
+.btn{border:2px solid #141a20;background:#f2b705;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer;margin-top:12px}
+.list{display:grid;gap:10px}.item{border:1px solid #e5e7eb;border-radius:10px;padding:12px}
+.muted{opacity:.62}.tag{display:inline-block;padding:3px 8px;border-radius:999px;background:#e9eef3;font-size:11px;margin:3px 3px 0 0}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="wrap" style="padding:0"><div class="brand">SHAMASH</div><div class="sub">Construction Management Orchestrator · Память проекта</div></div></header>
+<div class="wrap">
+<div class="grid">
+<nav id="nav">
+<button data-tab="dashboard" class="active">🏗️ Обзор</button>
+<button data-tab="memory">🧠 Память проекта</button>
+<button data-tab="tasks">📋 Работы и задачи</button>
+<button data-tab="materials">📦 Материалы</button>
+<button data-tab="money">₪ Деньги</button>
+<button data-tab="quality">✅ Качество</button>
+<button data-tab="safety">🦺 Безопасность</button>
+<button data-tab="warnings">⚠️ Ранние предупреждения</button>
+</nav>
+<main id="main"></main>
+</div>
+</div>
+<script>
+const KEY='shamash_orchestrator_v01';
+const blank={projects:[],records:[],tasks:[],materials:[],money:[],quality:[],safety:[],warnings:[]};
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||blank;
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render(current)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+let current='dashboard';
+function shell(title,body){return '<section class="card"><h2 style="margin-top:0">'+title+'</h2>'+body+'</section>'}
+function project(){return db.projects[0]}
+function dashboard(){
+ const p=project();
+ return shell('Объект управления',p?'<h3>'+esc(p.name)+'</h3><div class="muted">'+esc(p.location||'')+'</div>':'<div class="muted">Проект ещё не создан.</div>')+
+ shell('Состояние системы','<div class="kpis"><div class="kpi"><div class="num">'+db.records.length+'</div><div class="lab">записей памяти</div></div><div class="kpi"><div class="num">'+db.tasks.filter(x=>x.status!=='done').length+'</div><div class="lab">активных задач</div></div><div class="kpi"><div class="num">'+db.warnings.filter(x=>x.status==='new').length+'</div><div class="lab">новых предупреждений</div></div><div class="kpi"><div class="num">'+db.quality.filter(x=>x.status!=='closed').length+'</div><div class="lab">открытых дефектов</div></div></div>');
+}
+function memory(){
+ return shell('Память проекта',
+ '<div class="row"><div><label>Тип записи</label><select id="rtype"><option>Решение</option><option>Договорённость</option><option>Наблюдение</option><option>Выполненная работа</option><option>Документ</option><option>Фото / доказательство</option></select></div><div><label>Источник</label><select id="rsource"><option>site</option><option>whatsapp</option><option>email</option><option>voice</option><option>document</option><option>ai</option></select></div></div><label style="margin-top:12px">Содержание</label><textarea id="rtext" placeholder="Что произошло, что решено или что нужно сохранить..."></textarea><button class="btn" onclick="addRecord()">Сохранить в память</button>')+
+ shell('Последние записи', '<div class="list">'+(db.records.slice().reverse().slice(0,10).map(r=>'<div class="item"><b>'+esc(r.type)+'</b> <span class="tag">'+esc(r.source)+'</span><div style="margin-top:6px">'+esc(r.text)+'</div><div class="muted" style="margin-top:6px;font-size:11px">'+new Date(r.at).toLocaleString()+'</div></div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>');
+}
+function addRecord(){db.records.push({id:crypto.randomUUID(),type:document.getElementById('rtype').value,source:document.getElementById('rsource').value,text:document.getElementById('rtext').value,at:new Date().toISOString(),project_id:project()?.id||null});save()}
+function tasks(){return shell('Работы и задачи','<div class="row"><div><label>Задача</label><input id="tt" placeholder="Например: фасад — этаж 5"></div><div><label>Ответственный</label><input id="to" placeholder="Человек / бригада"></div></div><button class="btn" onclick="addTask()">Добавить задачу</button>')+shell('Список задач','<div class="list">'+(db.tasks.map(t=>'<div class="item"><b>'+esc(t.title)+'</b><div class="muted">'+esc(t.owner||'')+'</div></div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>')}
+function addTask(){db.tasks.push({id:crypto.randomUUID(),title:document.getElementById('tt').value,owner:document.getElementById('to').value,status:'planned'});save()}
+function generic(key,title,fields){return shell(title,'<div class="row">'+fields.map(f=>'<div><label>'+f.label+'</label><input id="'+f.id+'" placeholder="'+f.ph+'"></div>').join('')+'</div><button class="btn" onclick="addGeneric(\''+key+'\')">Сохранить</button>')+shell('Последние записи','<div class="list">'+(db[key].slice().reverse().slice(0,12).map(x=>'<div class="item">'+Object.values(x).filter(v=>typeof v==='string'&&v).slice(1,4).map(esc).join(' · ')+'</div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>')}
+function addGeneric(key){let o={id:crypto.randomUUID()}; document.querySelectorAll('#main input').forEach(i=>{if(i.id)o[i.id]=i.value});o.project_id=project()?.id||null;o.at=new Date().toISOString();db[key].push(o);save()}
+function projectSetup(){return shell('Новый проект',project()?'<div><b>'+esc(project().name)+'</b></div><div class="muted">'+esc(project().location||'')+'</div>':'<div><label>Название</label><input id="pn" placeholder="Например: Явне, Ha-Dror 10–12"></div><div style="margin-top:10px"><label>Местоположение</label><input id="pl" placeholder="Yavne, Israel"></div><button class="btn" onclick="createProject()">Создать проект</button>')}
+function createProject(){db.projects=[{id:crypto.randomUUID(),name:document.getElementById('pn').value,location:document.getElementById('pl').value,status:'active'}];save()}
+function render(tab){current=tab;document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));let h='';if(tab==='dashboard')h=dashboard()+projectSetup();if(tab==='memory')h=memory();if(tab==='tasks')h=tasks();if(tab==='materials')h=generic('materials','Материалы',[{id:'material_name',label:'Материал',ph:'Бетон / блоки / окна...'},{id:'event',label:'Событие',ph:'заказан / получен / израсходован'}]);if(tab==='money')h=generic('money','Деньги',[{id:'type',label:'Тип',ph:'счёт / оплата / прогноз'},{id:'amount',label:'Сумма, ₪',ph:'0'}]);if(tab==='quality')h=generic('quality','Качество',[{id:'title',label:'Дефект / замечание',ph:'Что обнаружено'},{id:'severity',label:'Приоритет',ph:'low / medium / high / critical'}]);if(tab==='safety')h=generic('safety','Безопасность',[{id:'observation',label:'Наблюдение',ph:'Что обнаружено на объекте'},{id:'hazard_level',label:'Уровень',ph:'low / medium / high / critical'}]);if(tab==='warnings')h=generic('warnings','Раннее предупреждение',[{id:'trigger_type',label:'Причина',ph:'schedule / quality / safety / money...'},{id:'warning',label:'Предупреждение',ph:'Что требует внимания'}]);document.getElementById('main').innerHTML=h}
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>render(b.dataset.tab));render('dashboard');
+</script>
+</body>
+</html>
