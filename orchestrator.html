@@ -30,6 +30,7 @@ input,textarea,select{width:100%;padding:10px;border:1px solid #cfd5da;border-ra
 <div class="grid">
 <nav id="nav">
 <button data-tab="dashboard" class="active">🏗️ Обзор</button>
+<button data-tab="planning">🗓️ Планирование</button>
 <button data-tab="memory">🧠 Память проекта</button>
 <button data-tab="tasks">📋 Работы и задачи</button>
 <button data-tab="materials">📦 Материалы</button>
@@ -43,8 +44,8 @@ input,textarea,select{width:100%;padding:10px;border:1px solid #cfd5da;border-ra
 </div>
 <script>
 const KEY='shamash_orchestrator_v01';
-const blank={projects:[],records:[],tasks:[],materials:[],money:[],quality:[],safety:[],warnings:[]};
-let db=JSON.parse(localStorage.getItem(KEY)||'null')||blank;
+const blank={projects:[],records:[],tasks:[],materials:[],money:[],quality:[],safety:[],warnings:[],plans:[]};
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||blank; db.plans=db.plans||[];
 function save(){localStorage.setItem(KEY,JSON.stringify(db));render(current)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 let current='dashboard';
@@ -61,13 +62,50 @@ function memory(){
  shell('Последние записи', '<div class="list">'+(db.records.slice().reverse().slice(0,10).map(r=>'<div class="item"><b>'+esc(r.type)+'</b> <span class="tag">'+esc(r.source)+'</span><div style="margin-top:6px">'+esc(r.text)+'</div><div class="muted" style="margin-top:6px;font-size:11px">'+new Date(r.at).toLocaleString()+'</div></div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>');
 }
 function addRecord(){db.records.push({id:crypto.randomUUID(),type:document.getElementById('rtype').value,source:document.getElementById('rsource').value,text:document.getElementById('rtext').value,at:new Date().toISOString(),project_id:project()?.id||null});save()}
+function planning(){
+ return shell('Планирование · WBS / Gantt',
+ '<div class="muted" style="margin-bottom:12px">План формируется по этапам и работам. SHAMASH будет сравнивать план, факт, зависимости, ресурсы и задержки.</div>'+
+ '<div class="row"><div><label>WBS-код</label><input id="pwbs" placeholder="1.2.3"></div><div><label>Работа / этап</label><input id="ptitle" placeholder="Например: устройство фасада"></div></div>'+
+ '<div class="row" style="margin-top:10px"><div><label>Плановое начало</label><input id="pstart" type="date"></div><div><label>Плановое окончание</label><input id="pend" type="date"></div></div>'+
+ '<div class="row" style="margin-top:10px"><div><label>Ответственный</label><input id="powner" placeholder="Бригада / подрядчик / инженер"></div><div><label>Зависит от</label><input id="pdep" placeholder="WBS-код предыдущей работы"></div></div>'+
+ '<div class="row" style="margin-top:10px"><div><label>Фактический прогресс, %</label><input id="pprog" type="number" min="0" max="100" value="0"></div><div><label>Статус</label><select id="pstatus"><option value="planned">Запланировано</option><option value="in_progress">В работе</option><option value="blocked">Заблокировано</option><option value="done">Выполнено</option></select></div></div>'+
+ '<button class="btn" onclick="addPlan()">Добавить в календарный план</button>')+
+ shell('Календарный план',
+ '<div class="list">'+(db.plans.slice().sort((a,b)=>(a.start||"").localeCompare(b.start||"")).map(p=>{
+   const st=p.status==='done'?'Выполнено':p.status==='blocked'?'Заблокировано':p.status==='in_progress'?'В работе':'Запланировано';
+   return '<div class="item"><div style="display:flex;justify-content:space-between;gap:8px"><div><b>'+esc(p.wbs)+' · '+esc(p.title)+'</b><div class="muted">'+esc(p.start||'')+' → '+esc(p.end||'')+'</div></div><span class="tag">'+st+'</span></div><div style="margin-top:8px;height:10px;background:#e9edf0;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+Math.max(0,Math.min(100,Number(p.progress)||0))+'%;background:#f2b705"></div></div><div class="muted" style="font-size:11px;margin-top:5px">'+(Number(p.progress)||0)+'% · '+esc(p.owner||'')+(p.dep?' · после '+esc(p.dep):'')+'</div></div>'
+ }).join('')||'<div class="muted">План пока пуст. Добавьте первый этап.</div>')+'</div>')+
+ ganttBoard();
+}
+function addPlan(){
+ const title=document.getElementById('ptitle').value.trim();
+ const start=document.getElementById('pstart').value;
+ const end=document.getElementById('pend').value;
+ if(!title||!start||!end){alert('Заполните работу и оба плановых срока.');return}
+ if(end<start){alert('Дата окончания не может быть раньше даты начала.');return}
+ db.plans.push({id:crypto.randomUUID(),project_id:project()?.id||null,wbs:document.getElementById('pwbs').value.trim()||String(db.plans.length+1),title,start,end,owner:document.getElementById('powner').value.trim(),dep:document.getElementById('pdep').value.trim(),progress:Math.max(0,Math.min(100,Number(document.getElementById('pprog').value)||0)),status:document.getElementById('pstatus').value});
+ save();
+}
+function ganttBoard(){
+ if(!db.plans.length) return '';
+ const ds=db.plans.flatMap(p=>[p.start,p.end]).filter(Boolean).map(x=>new Date(x+'T00:00:00').getTime());
+ const min=Math.min(...ds),max=Math.max(...ds),span=Math.max(1,max-min+86400000);
+ return shell('Gantt · визуальный план',
+ '<div class="list">'+db.plans.slice().sort((a,b)=>a.start.localeCompare(b.start)).map(p=>{
+   const s=new Date(p.start+'T00:00:00').getTime(),e=new Date(p.end+'T00:00:00').getTime();
+   const left=Math.max(0,((s-min)/span)*100),width=Math.max(2,(((e-s+86400000)/span)*100));
+   const prog=Math.max(0,Math.min(100,Number(p.progress)||0));
+   return '<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span><b>'+esc(p.wbs)+'</b> '+esc(p.title)+'</span><span class="muted">'+esc(p.start)+' — '+esc(p.end)+'</span></div><div style="position:relative;height:22px;background:#eef1f3;border-radius:6px;overflow:hidden"><div style="position:absolute;left:'+left+'%;width:'+width+'%;top:2px;height:18px;border-radius:5px;background:#b9c2ca"></div><div style="position:absolute;left:'+left+'%;width:'+Math.max(0,width*prog/100)+'%;top:2px;height:18px;border-radius:5px;background:#f2b705"></div></div></div>'
+ }).join('')+'</div>'+
+ '<div class="muted" style="font-size:11px;margin-top:10px">Жёлтая часть — фактический прогресс; серый диапазон — плановый срок.</div>');
+}
 function tasks(){return shell('Работы и задачи','<div class="row"><div><label>Задача</label><input id="tt" placeholder="Например: фасад — этаж 5"></div><div><label>Ответственный</label><input id="to" placeholder="Человек / бригада"></div></div><button class="btn" onclick="addTask()">Добавить задачу</button>')+shell('Список задач','<div class="list">'+(db.tasks.map(t=>'<div class="item"><b>'+esc(t.title)+'</b><div class="muted">'+esc(t.owner||'')+'</div></div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>')}
 function addTask(){db.tasks.push({id:crypto.randomUUID(),title:document.getElementById('tt').value,owner:document.getElementById('to').value,status:'planned'});save()}
 function generic(key,title,fields){return shell(title,'<div class="row">'+fields.map(f=>'<div><label>'+f.label+'</label><input id="'+f.id+'" placeholder="'+f.ph+'"></div>').join('')+'</div><button class="btn" onclick="addGeneric(\''+key+'\')">Сохранить</button>')+shell('Последние записи','<div class="list">'+(db[key].slice().reverse().slice(0,12).map(x=>'<div class="item">'+Object.values(x).filter(v=>typeof v==='string'&&v).slice(1,4).map(esc).join(' · ')+'</div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>')}
 function addGeneric(key){let o={id:crypto.randomUUID()}; document.querySelectorAll('#main input').forEach(i=>{if(i.id)o[i.id]=i.value});o.project_id=project()?.id||null;o.at=new Date().toISOString();db[key].push(o);save()}
 function projectSetup(){return shell('Новый проект',project()?'<div><b>'+esc(project().name)+'</b></div><div class="muted">'+esc(project().location||'')+'</div>':'<div><label>Название</label><input id="pn" placeholder="Например: Явне, Ha-Dror 10–12"></div><div style="margin-top:10px"><label>Местоположение</label><input id="pl" placeholder="Yavne, Israel"></div><button class="btn" onclick="createProject()">Создать проект</button>')}
 function createProject(){db.projects=[{id:crypto.randomUUID(),name:document.getElementById('pn').value,location:document.getElementById('pl').value,status:'active'}];save()}
-function render(tab){current=tab;document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));let h='';if(tab==='dashboard')h=dashboard()+projectSetup();if(tab==='memory')h=memory();if(tab==='tasks')h=tasks();if(tab==='materials')h=generic('materials','Материалы',[{id:'material_name',label:'Материал',ph:'Бетон / блоки / окна...'},{id:'event',label:'Событие',ph:'заказан / получен / израсходован'}]);if(tab==='money')h=generic('money','Деньги',[{id:'type',label:'Тип',ph:'счёт / оплата / прогноз'},{id:'amount',label:'Сумма, ₪',ph:'0'}]);if(tab==='quality')h=generic('quality','Качество',[{id:'title',label:'Дефект / замечание',ph:'Что обнаружено'},{id:'severity',label:'Приоритет',ph:'low / medium / high / critical'}]);if(tab==='safety')h=generic('safety','Безопасность',[{id:'observation',label:'Наблюдение',ph:'Что обнаружено на объекте'},{id:'hazard_level',label:'Уровень',ph:'low / medium / high / critical'}]);if(tab==='warnings')h=generic('warnings','Раннее предупреждение',[{id:'trigger_type',label:'Причина',ph:'schedule / quality / safety / money...'},{id:'warning',label:'Предупреждение',ph:'Что требует внимания'}]);document.getElementById('main').innerHTML=h}
+function render(tab){current=tab;document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));let h='';if(tab==='dashboard')h=dashboard()+projectSetup();if(tab==='planning')h=planning();if(tab==='memory')h=memory();if(tab==='tasks')h=tasks();if(tab==='materials')h=generic('materials','Материалы',[{id:'material_name',label:'Материал',ph:'Бетон / блоки / окна...'},{id:'event',label:'Событие',ph:'заказан / получен / израсходован'}]);if(tab==='money')h=generic('money','Деньги',[{id:'type',label:'Тип',ph:'счёт / оплата / прогноз'},{id:'amount',label:'Сумма, ₪',ph:'0'}]);if(tab==='quality')h=generic('quality','Качество',[{id:'title',label:'Дефект / замечание',ph:'Что обнаружено'},{id:'severity',label:'Приоритет',ph:'low / medium / high / critical'}]);if(tab==='safety')h=generic('safety','Безопасность',[{id:'observation',label:'Наблюдение',ph:'Что обнаружено на объекте'},{id:'hazard_level',label:'Уровень',ph:'low / medium / high / critical'}]);if(tab==='warnings')h=generic('warnings','Раннее предупреждение',[{id:'trigger_type',label:'Причина',ph:'schedule / quality / safety / money...'},{id:'warning',label:'Предупреждение',ph:'Что требует внимания'}]);document.getElementById('main').innerHTML=h}
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>render(b.dataset.tab));render('dashboard');
 </script>
 </body>
