@@ -65,3 +65,64 @@ Each record should carry:
 
 ## Audit principle
 Never silently overwrite important project facts. Corrections should create a new record/version and preserve the previous value and source.
+
+
+## Commercial, contract and subcontractor control
+SHAMASH must include a dedicated contract-control layer for contractors and subcontractors.
+
+### Contract review
+For every contract, store:
+- parties and role;
+- scope of work;
+- contract value and pricing method;
+- BOQ / price list references;
+- payment terms;
+- retention / deductions;
+- milestones and completion conditions;
+- change-order procedure;
+- deadlines and notice periods;
+- warranty / defect obligations;
+- insurance requirements;
+- required documents and certificates;
+- termination / suspension conditions;
+- dispute / claim provisions;
+- attachments and drawing/specification revisions.
+
+The system should extract obligations and convert important clauses into trackable controls. It must preserve the exact contract wording and document revision.
+
+### Subcontractor Excel control
+SHAMASH must be able to ingest subcontractor Excel files used for quantity and payment calculations without destroying the original file.
+
+The system maps spreadsheet columns to a standard model:
+- project / object;
+- BOQ item / WBS;
+- work description;
+- unit;
+- contract quantity;
+- previous approved quantity;
+- current claimed quantity;
+- cumulative quantity;
+- unit rate;
+- claimed amount;
+- approved amount;
+- retention / deductions;
+- VAT;
+- net payable;
+- supporting document / measurement evidence;
+- approval status.
+
+The engine compares:
+**contract quantity ↔ executed quantity ↔ subcontractor claim ↔ site evidence ↔ approved amount ↔ payment**.
+
+It must flag:
+- quantity above contract;
+- duplicate lines;
+- unexpected rate changes;
+- missing support;
+- claimed work not found in progress records;
+- discrepancies between Excel versions;
+- arithmetic/formula inconsistencies;
+- work marked complete without evidence;
+- paid amount inconsistent with approved amount.
+
+Original Excel remains the source file. SHAMASH creates a normalized, traceable interpretation and keeps the original file reference and import timestamp.
