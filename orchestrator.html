@@ -180,7 +180,22 @@ function addTask(){db.tasks.push({id:crypto.randomUUID(),title:document.getEleme
 function generic(key,title,fields){return shell(title,'<div class="row">'+fields.map(f=>'<div><label>'+f.label+'</label><input id="'+f.id+'" placeholder="'+f.ph+'"></div>').join('')+'</div><button class="btn" onclick="addGeneric(\''+key+'\')">Сохранить</button>')+shell('Последние записи','<div class="list">'+(db[key].slice().reverse().slice(0,12).map(x=>'<div class="item">'+Object.values(x).filter(v=>typeof v==='string'&&v).slice(1,4).map(esc).join(' · ')+'</div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>')}
 function addGeneric(key){let o={id:crypto.randomUUID()}; document.querySelectorAll('#main input').forEach(i=>{if(i.id)o[i.id]=i.value});o.project_id=project()?.id||null;o.at=new Date().toISOString();db[key].push(o);save()}
 function projectSetup(){return shell('Новый проект',project()?'<div><b>'+esc(project().name)+'</b></div><div class="muted">'+esc(project().location||'')+'</div>':'<div><label>Название</label><input id="pn" placeholder="Например: Явне, Ha-Dror 10–12"></div><div style="margin-top:10px"><label>Местоположение</label><input id="pl" placeholder="Yavne, Israel"></div><button class="btn" onclick="createProject()">Создать проект</button>')}
-function createProject(){db.projects=[{id:crypto.randomUUID(),name:document.getElementById('pn').value,location:document.getElementById('pl').value,status:'active'}];save()}
+function createProject(){
+  const newProject = {
+    id: crypto.randomUUID(),
+    name: document.getElementById('pn').value,
+    location: document.getElementById('pl').value,
+    status: 'active'
+  };
+
+  db.projects = [newProject];
+
+  if(window.shamashRegisterProject){
+    window.shamashRegisterProject(newProject);
+  }
+
+  save();
+}
 function render(tab){current=tab;document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));let h='';if(tab==='dashboard')h=dashboard()+projectSetup();if(tab==='planning')h=planning();if(tab==='protocols')h=protocols();if(tab==='memory')h=memory();if(tab==='tasks')h=tasks();if(tab==='materials')h=generic('materials','Материалы',[{id:'material_name',label:'Материал',ph:'Бетон / блоки / окна...'},{id:'event',label:'Событие',ph:'заказан / получен / израсходован'}]);if(tab==='money')h=generic('money','Деньги',[{id:'type',label:'Тип',ph:'счёт / оплата / прогноз'},{id:'amount',label:'Сумма, ₪',ph:'0'}]);if(tab==='quality')h=generic('quality','Качество',[{id:'title',label:'Дефект / замечание',ph:'Что обнаружено'},{id:'severity',label:'Приоритет',ph:'low / medium / high / critical'}]);if(tab==='safety')h=generic('safety','Безопасность',[{id:'observation',label:'Наблюдение',ph:'Что обнаружено на объекте'},{id:'hazard_level',label:'Уровень',ph:'low / medium / high / critical'}]);if(tab==='warnings')h=generic('warnings','Раннее предупреждение',[{id:'trigger_type',label:'Причина',ph:'schedule / quality / safety / money...'},{id:'warning',label:'Предупреждение',ph:'Что требует внимания'}]);document.getElementById('main').innerHTML=h}
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>render(b.dataset.tab));render('dashboard');
 </script>
