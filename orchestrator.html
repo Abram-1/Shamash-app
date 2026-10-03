@@ -213,11 +213,12 @@ function ganttBoard(){
  }).join('')+'</div>'+
  '<div class="muted" style="font-size:11px;margin-top:10px">Жёлтая часть — фактический прогресс; серый диапазон — плановый срок.</div>');
 }
-function tasks(){return shell('Работы и задачи','<div class="row"><div><label>Задача</label><input id="tt" placeholder="Например: фасад — этаж 5"></div><div><label>Ответственный</label><input id="to" placeholder="Человек / бригада"></div></div><button class="btn" onclick="addTask()">Добавить задачу</button>')+shell('Список задач','<div class="list">'+(db.tasks.map(t=>'<div class="item"><b>'+esc(t.title)+'</b><div class="muted">Ответственный: '+esc(t.owner||'не указан')+'</div></div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>')}
+function tasks(){const planOptions='<option value="">Без связи с графиком</option>'+db.plans.slice().sort((a,b)=>(a.wbs||'').localeCompare(b.wbs||'')).map(p=>'<option value="'+esc(p.id)+'">'+esc((p.wbs||'')+' — '+p.title)+'</option>').join('');return shell('Работы и задачи','<div class="row"><div><label>Задача</label><input id="tt" placeholder="Например: фасад — этаж 5"></div><div><label>Ответственный</label><input id="to" placeholder="Человек / бригада"></div></div><div style="margin-top:10px"><label>Связать с календарным планом / WBS</label><select id="tschedule">'+planOptions+'</select></div><button class="btn" onclick="addTask()">Добавить задачу</button>')+shell('Список задач','<div class="list">'+(db.tasks.map(t=>{const p=db.plans.find(p=>p.id===t.scheduleItemId);return '<div class="item"><b>'+esc(t.title)+'</b><div class="muted">Ответственный: '+esc(t.owner||'не указан')+(p?' · План: '+esc((p.wbs||'')+' — '+p.title):'')+'</div></div>'}).join('')||'<div class="muted">Пока пусто.</div>')+'</div>')}
 function addTask(){
   const title=document.getElementById('tt').value.trim();
   const owner=document.getElementById('to').value.trim();
   const projectId=project()?.id||null;
+ const scheduleItemId=document.getElementById('tschedule')?.value||null;
 
   if(!title){
     alert('Введите название задачи.');
@@ -229,6 +230,7 @@ function addTask(){
     project_id:projectId,
     title:title,
     owner:owner,
+   scheduleItemId:scheduleItemId,
     status:'planned'
   };
 
@@ -241,7 +243,7 @@ function addTask(){
       title:taskItem.title,
       owner:taskItem.owner,
       status:taskItem.status,
-      scheduleItemId:null,
+      scheduleItemId:taskItem.scheduleItemId,
       progress:0
     });
   }
