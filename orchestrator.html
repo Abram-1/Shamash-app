@@ -53,7 +53,7 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
 let current='dashboard';
 function shell(title,body){return '<section class="card"><h2 style="margin-top:0">'+title+'</h2>'+body+'</section>'}
 function project(){return db.projects[0]}
- function building(){return db.buildings.find(b=>b.project_id===project()?.id)||null}
+function building(){const p=project();if(!p)return null;return db.buildings.find(b=>b.project_id===p.id)||db.buildings[0]||null}
 function dashboard(){
  const p=project();
  const b=building();
