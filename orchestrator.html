@@ -62,7 +62,52 @@ function memory(){
  '<div class="row"><div><label>Тип записи</label><select id="rtype"><option>Решение</option><option>Договорённость</option><option>Наблюдение</option><option>Выполненная работа</option><option>Документ</option><option>Фото / доказательство</option></select></div><div><label>Источник</label><select id="rsource"><option>site</option><option>whatsapp</option><option>email</option><option>voice</option><option>document</option><option>ai</option></select></div></div><label style="margin-top:12px">Содержание</label><textarea id="rtext" placeholder="Что произошло, что решено или что нужно сохранить..."></textarea><button class="btn" onclick="addRecord()">Сохранить в память</button>')+
  shell('Последние записи', '<div class="list">'+(db.records.slice().reverse().slice(0,10).map(r=>'<div class="item"><b>'+esc(r.type)+'</b> <span class="tag">'+esc(r.source)+'</span><div style="margin-top:6px">'+esc(r.text)+'</div><div class="muted" style="margin-top:6px;font-size:11px">'+new Date(r.at).toLocaleString()+'</div></div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>');
 }
-function addRecord(){db.records.push({id:crypto.randomUUID(),type:document.getElementById('rtype').value,source:document.getElementById('rsource').value,text:document.getElementById('rtext').value,at:new Date().toISOString(),project_id:project()?.id||null});save()}
+function addRecord(){
+  const type=document.getElementById('rtype').value;
+  const source=document.getElementById('rsource').value;
+  const text=document.getElementById('rtext').value.trim();
+  const projectId=project()?.id||null;
+
+  if(!text){
+    alert('Введите содержание записи.');
+    return;
+  }
+
+  const legacyRecord={
+    id:crypto.randomUUID(),
+    type,
+    source,
+    text,
+    at:new Date().toISOString(),
+    project_id:projectId
+  };
+
+  db.records.push(legacyRecord);
+
+  if(window.shamashCreateRecord && window.shamashAddToProjectMemory){
+    const coreRecord=window.shamashCreateRecord({
+      projectId:projectId,
+      type:type,
+      title:text,
+      data:{
+        text:text,
+        legacyRecordId:legacyRecord.id
+      },
+      sourceType:source.toUpperCase(),
+      sourceReference:'orchestrator.html',
+      factStatus:'NEEDS_CONFIRMATION',
+      createdBy:null
+    });
+
+    window.shamashAddToProjectMemory(coreRecord);
+
+    if(window.shamashCoreSave){
+      window.shamashCoreSave();
+    }
+  }
+
+  save();
+}
 function protocols(){
   return shell('Протоколы проверки · ответ по каждому замечанию',
     '<div class="muted" style="margin-bottom:12px">SHAMASH сохраняет формулировку проверяющего отдельно от анализа и предлагаемого ответа.</div>'+
