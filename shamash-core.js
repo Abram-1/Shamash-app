@@ -416,3 +416,58 @@ function shamashAddScheduleItem(item) {
 }
 
 window.shamashAddScheduleItem = shamashAddScheduleItem;
+/* =========================================================
+   PROJECT TASKS
+   Работы и задачи проекта
+   ========================================================= */
+
+function shamashAddTask(task) {
+
+  if (!task || !task.id || !task.projectId || !task.title) {
+    throw new Error(
+      "SHAMASH CORE: задача должна иметь id, projectId и title."
+    );
+  }
+
+  const existingTask = SHAMASH_CORE.tasks.find(
+    function (item) {
+      return item.id === task.id;
+    }
+  );
+
+  if (existingTask) {
+    return existingTask;
+  }
+
+  const coreTask = {
+    id: task.id,
+    projectId: task.projectId,
+    title: task.title,
+    owner: task.owner || "",
+    status: task.status || "planned",
+    scheduleItemId: task.scheduleItemId || null,
+    progress: Number(task.progress) || 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: null,
+    version: 1,
+    history: []
+  };
+
+  SHAMASH_CORE.tasks.push(coreTask);
+
+  shamashAudit(
+    "TASK_ADDED",
+    coreTask.id,
+    null,
+    {
+      projectId: coreTask.projectId,
+      scheduleItemId: coreTask.scheduleItemId
+    }
+  );
+
+  shamashCoreSave();
+
+  return coreTask;
+}
+
+window.shamashAddTask = shamashAddTask;
