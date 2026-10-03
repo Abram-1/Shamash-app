@@ -214,7 +214,40 @@ function ganttBoard(){
  '<div class="muted" style="font-size:11px;margin-top:10px">Жёлтая часть — фактический прогресс; серый диапазон — плановый срок.</div>');
 }
 function tasks(){return shell('Работы и задачи','<div class="row"><div><label>Задача</label><input id="tt" placeholder="Например: фасад — этаж 5"></div><div><label>Ответственный</label><input id="to" placeholder="Человек / бригада"></div></div><button class="btn" onclick="addTask()">Добавить задачу</button>')+shell('Список задач','<div class="list">'+(db.tasks.map(t=>'<div class="item"><b>'+esc(t.title)+'</b><div class="muted">'+esc(t.owner||'')+'</div></div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>')}
-function addTask(){db.tasks.push({id:crypto.randomUUID(),title:document.getElementById('tt').value,owner:document.getElementById('to').value,status:'planned'});save()}
+function addTask(){
+  const title=document.getElementById('tt').value.trim();
+  const owner=document.getElementById('to').value.trim();
+  const projectId=project()?.id||null;
+
+  if(!title){
+    alert('Введите название задачи.');
+    return;
+  }
+
+  const taskItem={
+    id:crypto.randomUUID(),
+    project_id:projectId,
+    title:title,
+    owner:owner,
+    status:'planned'
+  };
+
+  db.tasks.push(taskItem);
+
+  if(window.shamashAddTask && projectId){
+    window.shamashAddTask({
+      id:taskItem.id,
+      projectId:projectId,
+      title:taskItem.title,
+      owner:taskItem.owner,
+      status:taskItem.status,
+      scheduleItemId:null,
+      progress:0
+    });
+  }
+
+  save();
+}
 function generic(key,title,fields){return shell(title,'<div class="row">'+fields.map(f=>'<div><label>'+f.label+'</label><input id="'+f.id+'" placeholder="'+f.ph+'"></div>').join('')+'</div><button class="btn" onclick="addGeneric(\''+key+'\')">Сохранить</button>')+shell('Последние записи','<div class="list">'+(db[key].slice().reverse().slice(0,12).map(x=>'<div class="item">'+Object.values(x).filter(v=>typeof v==='string'&&v).slice(1,4).map(esc).join(' · ')+'</div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>')}
 function addGeneric(key){let o={id:crypto.randomUUID()}; document.querySelectorAll('#main input').forEach(i=>{if(i.id)o[i.id]=i.value});o.project_id=project()?.id||null;o.at=new Date().toISOString();db[key].push(o);save()}
 function projectSetup(){return shell('Новый проект',project()?'<div><b>'+esc(project().name)+'</b></div><div class="muted">'+esc(project().location||'')+'</div>':'<div><label>Название</label><input id="pn" placeholder="Например: Явне, Ha-Dror 10–12"></div><div style="margin-top:10px"><label>Местоположение</label><input id="pl" placeholder="Yavne, Israel"></div><button class="btn" onclick="createProject()">Создать проект</button>')}
