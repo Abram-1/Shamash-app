@@ -265,6 +265,7 @@ function createProject(){
   };
 
   db.projects = [newProject];
+ db.buildings = [{id:crypto.randomUUID(),project_id:newProject.id,name:'Ha-Dror 12',status:'active'}];
 
   if(window.shamashRegisterProject){
     window.shamashRegisterProject(newProject);
