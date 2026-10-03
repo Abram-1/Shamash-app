@@ -45,16 +45,19 @@ input,textarea,select{width:100%;padding:10px;border:1px solid #cfd5da;border-ra
 </div>
 <script>
 const KEY='shamash_orchestrator_v01';
-const blank={projects:[],records:[],tasks:[],materials:[],money:[],quality:[],protocols:[],safety:[],warnings:[],plans:[]};
+const blank={projects:[],buildings:[],records:[],tasks:[],materials:[],money:[],quality:[],protocols:[],safety:[],warnings:[],plans:[]};
 let db=JSON.parse(localStorage.getItem(KEY)||'null')||blank; db.plans=db.plans||[]; db.protocols=db.protocols||[];
+ if(!db.buildings) db.buildings=[];
 function save(){localStorage.setItem(KEY,JSON.stringify(db));render(current)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 let current='dashboard';
 function shell(title,body){return '<section class="card"><h2 style="margin-top:0">'+title+'</h2>'+body+'</section>'}
 function project(){return db.projects[0]}
+ function building(){return db.buildings.find(b=>b.project_id===project()?.id)||null}
 function dashboard(){
  const p=project();
- return shell('Объект управления',p?'<h3>'+esc(p.name)+'</h3><div class="muted">'+esc(p.location||'')+'</div>':'<div class="muted">Проект ещё не создан.</div>')+
+ const b=building();
+return shell('Объект управления',p?'<h3>'+esc(p.name)+'</h3><div class="muted">'+esc(p.location||'')+'</div><div style="margin-top:12px"><b>Здание:</b> '+(b?esc(b.name):'не выбрано')+'</div>':'<div class="muted">Проект ещё не создан.</div>')+
  shell('Состояние системы','<div class="kpis"><div class="kpi"><div class="num">'+db.records.length+'</div><div class="lab">записей памяти</div></div><div class="kpi"><div class="num">'+db.tasks.filter(x=>x.status!=='done').length+'</div><div class="lab">активных задач</div></div><div class="kpi"><div class="num">'+db.warnings.filter(x=>x.status==='new').length+'</div><div class="lab">новых предупреждений</div></div><div class="kpi"><div class="num">'+db.quality.filter(x=>x.status!=='closed').length+'</div><div class="lab">открытых дефектов</div></div></div>');
 }
 function memory(){
