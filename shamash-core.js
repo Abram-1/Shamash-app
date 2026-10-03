@@ -313,3 +313,48 @@ window.shamashCoreSave = shamashCoreSave;
 window.shamashCoreLoad = shamashCoreLoad;
 
 shamashCoreLoad();
+/* =========================================================
+   PROJECT REGISTRY
+   Связь строительных объектов с SHAMASH CORE
+   ========================================================= */
+
+function shamashRegisterProject(project) {
+
+  if (!project || !project.id || !project.name) {
+    throw new Error(
+      "SHAMASH CORE: проект должен иметь id и name."
+    );
+  }
+
+  const existingProject = SHAMASH_CORE.projects.find(
+    function (item) {
+      return item.id === project.id;
+    }
+  );
+
+  if (existingProject) {
+    return existingProject;
+  }
+
+  const coreProject = {
+    id: project.id,
+    name: project.name,
+    location: project.location || "",
+    status: project.status || "active",
+    createdAt: new Date().toISOString()
+  };
+
+  SHAMASH_CORE.projects.push(coreProject);
+
+  shamashAudit(
+    "PROJECT_REGISTERED",
+    coreProject.id,
+    null
+  );
+
+  shamashCoreSave();
+
+  return coreProject;
+}
+
+window.shamashRegisterProject = shamashRegisterProject;
