@@ -266,4 +266,50 @@ window.SHAMASH_CORE = SHAMASH_CORE;
 window.shamashCoreInit = shamashCoreInit;
 window.shamashCreateRecord = shamashCreateRecord;
 window.shamashAddToProjectMemory = shamashAddToProjectMemory;
-window.shamashConfirmFact = shamashConfirmFact;
+window.shamashConfirmFact = shamashConfirmFact;/* =========================================================
+   PROJECT MEMORY — LOCAL STORAGE
+   Сохранение памяти проекта в браузере
+   ========================================================= */
+
+const SHAMASH_CORE_STORAGE_KEY = "shamash-core-v01";
+
+function shamashCoreSave() {
+  try {
+    localStorage.setItem(
+      SHAMASH_CORE_STORAGE_KEY,
+      JSON.stringify(SHAMASH_CORE)
+    );
+    return true;
+  } catch (error) {
+    console.error("SHAMASH CORE: ошибка сохранения", error);
+    return false;
+  }
+}
+
+function shamashCoreLoad() {
+  try {
+    const saved = localStorage.getItem(SHAMASH_CORE_STORAGE_KEY);
+
+    if (!saved) {
+      return SHAMASH_CORE;
+    }
+
+    const data = JSON.parse(saved);
+
+    Object.keys(SHAMASH_CORE).forEach(function (key) {
+      if (data[key] !== undefined) {
+        SHAMASH_CORE[key] = data[key];
+      }
+    });
+
+    return SHAMASH_CORE;
+  } catch (error) {
+    console.error("SHAMASH CORE: ошибка загрузки", error);
+    return SHAMASH_CORE;
+  }
+}
+
+window.shamashCoreSave = shamashCoreSave;
+window.shamashCoreLoad = shamashCoreLoad;
+
+shamashCoreLoad();
