@@ -69,9 +69,10 @@ return shell('Объект управления',p?'<h3>'+esc(p.name)+'</h3><div
  shell('Состояние системы','<div class="kpis"><div class="kpi"><div class="num">'+db.records.length+'</div><div class="lab">записей памяти</div></div><div class="kpi"><div class="num">'+db.tasks.filter(x=>x.status!=='done').length+'</div><div class="lab">активных задач</div></div><div class="kpi"><div class="num">'+db.warnings.filter(x=>x.status==='new').length+'</div><div class="lab">новых предупреждений</div></div><div class="kpi"><div class="num">'+db.quality.filter(x=>x.status!=='closed').length+'</div><div class="lab">открытых дефектов</div></div></div>');
 }
 function memory(){
+ const b=building();
  return shell('Память проекта',
  '<div class="row"><div><label>Тип записи</label><select id="rtype"><option>Решение</option><option>Договорённость</option><option>Наблюдение</option><option>Выполненная работа</option><option>Документ</option><option>Фото / доказательство</option></select></div><div><label>Источник</label><select id="rsource"><option>site</option><option>whatsapp</option><option>email</option><option>voice</option><option>document</option><option>ai</option></select></div></div><label style="margin-top:12px">Содержание</label><textarea id="rtext" placeholder="Что произошло, что решено или что нужно сохранить..."></textarea><button class="btn" onclick="addRecord()">Сохранить в память</button>')+
- shell('Последние записи', '<div class="list">'+(db.records.slice().reverse().slice(0,10).map(r=>'<div class="item"><b>'+esc(r.type)+'</b> <span class="tag">'+esc(r.source)+'</span><div style="margin-top:6px">'+esc(r.text)+'</div><div class="muted" style="margin-top:6px;font-size:11px">'+new Date(r.at).toLocaleString()+'</div></div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>');
+ shell('Последние записи', '<div class="list">'+(db.records.filter(r=>!r.building_id||r.building_id===b?.id).slice().reverse()).slice(0,10).map(r=>'<div class="item"><b>'+esc(r.type)+'</b> <span class="tag">'+esc(r.source)+'</span><div style="margin-top:6px">'+esc(r.text)+'</div><div class="muted" style="margin-top:6px;font-size:11px">'+new Date(r.at).toLocaleString()+'</div></div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>');
 }
 function addRecord(){
   const type=document.getElementById('rtype').value;
