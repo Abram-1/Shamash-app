@@ -90,7 +90,8 @@ function addRecord(){
     source,
     text,
     at:new Date().toISOString(),
-    project_id:projectId
+    project_id:projectId,
+   building_id:building()?.id||null
   };
 
   db.records.push(legacyRecord);
