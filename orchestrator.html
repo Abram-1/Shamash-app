@@ -154,13 +154,51 @@ function planning(){
  ganttBoard();
 }
 function addPlan(){
- const title=document.getElementById('ptitle').value.trim();
- const start=document.getElementById('pstart').value;
- const end=document.getElementById('pend').value;
- if(!title||!start||!end){alert('Заполните работу и оба плановых срока.');return}
- if(end<start){alert('Дата окончания не может быть раньше даты начала.');return}
- db.plans.push({id:crypto.randomUUID(),project_id:project()?.id||null,wbs:document.getElementById('pwbs').value.trim()||String(db.plans.length+1),title,start,end,owner:document.getElementById('powner').value.trim(),dep:document.getElementById('pdep').value.trim(),progress:Math.max(0,Math.min(100,Number(document.getElementById('pprog').value)||0)),status:document.getElementById('pstatus').value});
- save();
+  const title=document.getElementById('ptitle').value.trim();
+  const start=document.getElementById('pstart').value;
+  const end=document.getElementById('pend').value;
+
+  if(!title||!start||!end){
+    alert('Заполните работу и оба плановых срока.');
+    return;
+  }
+
+  if(end<start){
+    alert('Дата окончания не может быть раньше даты начала.');
+    return;
+  }
+
+  const planItem={
+    id:crypto.randomUUID(),
+    project_id:project()?.id||null,
+    wbs:document.getElementById('pwbs').value.trim()||String(db.plans.length+1),
+    title:title,
+    start:start,
+    end:end,
+    owner:document.getElementById('powner').value.trim(),
+    dep:document.getElementById('pdep').value.trim(),
+    progress:Math.max(0,Math.min(100,Number(document.getElementById('pprog').value)||0)),
+    status:document.getElementById('pstatus').value
+  };
+
+  db.plans.push(planItem);
+
+  if(window.shamashAddScheduleItem && planItem.project_id){
+    window.shamashAddScheduleItem({
+      id:planItem.id,
+      projectId:planItem.project_id,
+      wbs:planItem.wbs,
+      title:planItem.title,
+      start:planItem.start,
+      end:planItem.end,
+      owner:planItem.owner,
+      dependency:planItem.dep,
+      progress:planItem.progress,
+      status:planItem.status
+    });
+  }
+
+  save();
 }
 function ganttBoard(){
  if(!db.plans.length) return '';
