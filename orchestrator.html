@@ -49,6 +49,7 @@ const blank={projects:[],buildings:[],records:[],tasks:[],materials:[],money:[],
 let db=JSON.parse(localStorage.getItem(KEY)||'null')||blank; db.plans=db.plans||[]; db.protocols=db.protocols||[];
  if(!db.buildings) db.buildings=[];
  if(db.projects[0] && db.buildings.length===0) db.buildings.push({id:crypto.randomUUID(),project_id:db.projects[0].id,name:'Ha-Dror 12',status:'active'});
+ if(db.projects[0] && !db.buildings.some(b=>b.project_id===db.projects[0].id && b.name==='Ha-Dror 10')) db.buildings.push({id:crypto.randomUUID(),project_id:db.projects[0].id,name:'Ha-Dror 10',status:'active'});
 function save(){localStorage.setItem(KEY,JSON.stringify(db));render(current)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 let current='dashboard';
