@@ -213,7 +213,7 @@ function ganttBoard(){
  }).join('')+'</div>'+
  '<div class="muted" style="font-size:11px;margin-top:10px">Жёлтая часть — фактический прогресс; серый диапазон — плановый срок.</div>');
 }
-function tasks(){return shell('Работы и задачи','<div class="row"><div><label>Задача</label><input id="tt" placeholder="Например: фасад — этаж 5"></div><div><label>Ответственный</label><input id="to" placeholder="Человек / бригада"></div></div><button class="btn" onclick="addTask()">Добавить задачу</button>')+shell('Список задач','<div class="list">'+(db.tasks.map(t=>'<div class="item"><b>'+esc(t.title)+'</b><div class="muted">'+esc(t.owner||'')+'</div></div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>')}
+function tasks(){return shell('Работы и задачи','<div class="row"><div><label>Задача</label><input id="tt" placeholder="Например: фасад — этаж 5"></div><div><label>Ответственный</label><input id="to" placeholder="Человек / бригада"></div></div><button class="btn" onclick="addTask()">Добавить задачу</button>')+shell('Список задач','<div class="list">'+(db.tasks.map(t=>'<div class="item"><b>'+esc(t.title)+'</b><div class="muted">Ответственный: '+esc(t.owner||'не указан')+'</div></div>').join('')||'<div class="muted">Пока пусто.</div>')+'</div>')}
 function addTask(){
   const title=document.getElementById('tt').value.trim();
   const owner=document.getElementById('to').value.trim();
