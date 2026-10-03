@@ -55,11 +55,17 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
 let current='dashboard';
 function shell(title,body){return '<section class="card"><h2 style="margin-top:0">'+title+'</h2>'+body+'</section>'}
 function project(){return db.projects[0]}
-function building(){const p=project();if(!p)return null;return db.buildings.find(b=>b.project_id===p.id)||db.buildings[0]||null}
+function building(){const p=project();if(!p)return null;const list=db.buildings.filter(b=>b.project_id===p.id);return list.find(b=>b.id===selectedBuildingId)||list[0]||null}
+ let selectedBuildingId=localStorage.getItem('shamash_selected_building')||null;
+ function selectBuilding(id){
+  selectedBuildingId=id;
+  localStorage.setItem('shamash_selected_building',id);
+  render(current);
+}
 function dashboard(){
  const p=project();
  const b=building();
-return shell('Объект управления',p?'<h3>'+esc(p.name)+'</h3><div class="muted">'+esc(p.location||'')+'</div><div style="margin-top:12px"><b>Здание:</b> '+(b?esc(b.name):'не выбрано')+'</div>':'<div class="muted">Проект ещё не создан.</div>')+
+return shell('Объект управления',p?'<h3>'+esc(p.name)+'</h3><div class="muted">'+esc(p.location||'')+'</div><div style="margin-top:12px"><b>Здание:</b> '+(b?esc(b.name):'не выбрано')+'</div><div style="margin-top:12px"><button onclick="selectBuilding(db.buildings.find(x=>x.name===\'Ha-Dror 12\')?.id)">Ha-Dror 12</button> <button onclick="selectBuilding(db.buildings.find(x=>x.name===\'Ha-Dror 10\')?.id)">Ha-Dror 10</button></div>':'<div class="muted">Проект ещё не создан.</div>')+
  shell('Состояние системы','<div class="kpis"><div class="kpi"><div class="num">'+db.records.length+'</div><div class="lab">записей памяти</div></div><div class="kpi"><div class="num">'+db.tasks.filter(x=>x.status!=='done').length+'</div><div class="lab">активных задач</div></div><div class="kpi"><div class="num">'+db.warnings.filter(x=>x.status==='new').length+'</div><div class="lab">новых предупреждений</div></div><div class="kpi"><div class="num">'+db.quality.filter(x=>x.status!=='closed').length+'</div><div class="lab">открытых дефектов</div></div></div>');
 }
 function memory(){
