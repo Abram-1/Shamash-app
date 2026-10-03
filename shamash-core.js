@@ -358,3 +358,61 @@ function shamashRegisterProject(project) {
 }
 
 window.shamashRegisterProject = shamashRegisterProject;
+/* =========================================================
+   PROJECT SCHEDULE
+   Календарное планирование проекта
+   ========================================================= */
+
+function shamashAddScheduleItem(item) {
+
+  if (!item || !item.id || !item.projectId || !item.title) {
+    throw new Error(
+      "SHAMASH CORE: работа календарного плана должна иметь id, projectId и title."
+    );
+  }
+
+  const existingItem = SHAMASH_CORE.schedule.find(
+    function (scheduleItem) {
+      return scheduleItem.id === item.id;
+    }
+  );
+
+  if (existingItem) {
+    return existingItem;
+  }
+
+  const coreScheduleItem = {
+    id: item.id,
+    projectId: item.projectId,
+    wbs: item.wbs || "",
+    title: item.title,
+    start: item.start || null,
+    end: item.end || null,
+    owner: item.owner || "",
+    dependency: item.dependency || "",
+    progress: Number(item.progress) || 0,
+    status: item.status || "planned",
+    createdAt: new Date().toISOString(),
+    updatedAt: null,
+    version: 1,
+    history: []
+  };
+
+  SHAMASH_CORE.schedule.push(coreScheduleItem);
+
+  shamashAudit(
+    "SCHEDULE_ITEM_ADDED",
+    coreScheduleItem.id,
+    null,
+    {
+      projectId: coreScheduleItem.projectId,
+      wbs: coreScheduleItem.wbs
+    }
+  );
+
+  shamashCoreSave();
+
+  return coreScheduleItem;
+}
+
+window.shamashAddScheduleItem = shamashAddScheduleItem;
