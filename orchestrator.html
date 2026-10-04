@@ -184,6 +184,7 @@ function addPlan(){
   const planItem={
     id:crypto.randomUUID(),
     project_id:project()?.id||null,
+   building_id:building()?.id||null,
     wbs:document.getElementById('pwbs').value.trim()||String(db.plans.length+1),
     title:title,
     start:start,
