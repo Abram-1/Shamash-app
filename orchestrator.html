@@ -215,11 +215,12 @@ function addPlan(){
   save();
 }
 function ganttBoard(){
- if(!db.plans.length) return '';
- const ds=db.plans.flatMap(p=>[p.start,p.end]).filter(Boolean).map(x=>new Date(x+'T00:00:00').getTime());
+  const plans=db.plans.filter(p=>!p.building_id||p.building_id===building()?.id);
+  if(!plans.length) return '';
+ const ds=plans.flatMap(p=>[p.start,p.end]).filter(Boolean).map(x=>new Date(x+'T00:00:00').getTime());
  const min=Math.min(...ds),max=Math.max(...ds),span=Math.max(1,max-min+86400000);
  return shell('Gantt · визуальный план',
- '<div class="list">'+db.plans.slice().sort((a,b)=>a.start.localeCompare(b.start)).map(p=>{
+ '<div class="list">'+plans.slice().sort((a,b)=>a.start.localeCompare(b.start)).map(p=>{
    const s=new Date(p.start+'T00:00:00').getTime(),e=new Date(p.end+'T00:00:00').getTime();
    const left=Math.max(0,((s-min)/span)*100),width=Math.max(2,(((e-s+86400000)/span)*100));
    const prog=Math.max(0,Math.min(100,Number(p.progress)||0));
