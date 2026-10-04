@@ -241,6 +241,7 @@ function addTask(){
   const taskItem={
     id:crypto.randomUUID(),
     project_id:projectId,
+   building_id:building()?.id||null,
     title:title,
     owner:owner,
    scheduleItemId:scheduleItemId,
