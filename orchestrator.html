@@ -160,7 +160,7 @@ function planning(){
  '<div class="row" style="margin-top:10px"><div><label>Фактический прогресс, %</label><input id="pprog" type="number" min="0" max="100" value="0"></div><div><label>Статус</label><select id="pstatus"><option value="planned">Запланировано</option><option value="in_progress">В работе</option><option value="blocked">Заблокировано</option><option value="done">Выполнено</option></select></div></div>'+
  '<button class="btn" onclick="addPlan()">Добавить в календарный план</button>')+
  shell('Календарный план',
- '<div class="list">'+(db.plans.slice().sort((a,b)=>(a.start||"").localeCompare(b.start||"")).map(p=>{
+ '<div class="list">'+(db.plans.filter(p=>!p.building_id||p.building_id===building()?.id).slice().sort((a,b)=>(a.start||"").localeCompare(b.start||"")).map(p=>{
    const st=p.status==='done'?'Выполнено':p.status==='blocked'?'Заблокировано':p.status==='in_progress'?'В работе':'Запланировано';
    return '<div class="item"><div style="display:flex;justify-content:space-between;gap:8px"><div><b>'+esc(p.wbs)+' · '+esc(p.title)+'</b><div class="muted">'+esc(p.start||'')+' → '+esc(p.end||'')+'</div></div><span class="tag">'+st+'</span></div><div style="margin-top:8px;height:10px;background:#e9edf0;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+Math.max(0,Math.min(100,Number(p.progress)||0))+'%;background:#f2b705"></div></div><div class="muted" style="font-size:11px;margin-top:5px">'+(Number(p.progress)||0)+'% · '+esc(p.owner||'')+(p.dep?' · после '+esc(p.dep):'')+'</div></div>'
  }).join('')||'<div class="muted">План пока пуст. Добавьте первый этап.</div>')+'</div>')+
