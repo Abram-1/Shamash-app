@@ -162,7 +162,7 @@ function planning(){
  shell('Календарный план',
  '<div class="list">'+(db.plans.filter(p=>!p.building_id||p.building_id===building()?.id).slice().sort((a,b)=>(a.start||"").localeCompare(b.start||"")).map(p=>{
    const st=p.status==='done'?'Выполнено':p.status==='blocked'?'Заблокировано':p.status==='in_progress'?'В работе':'Запланировано';
-   return '<div class="item"><div style="display:flex;justify-content:space-between;gap:8px"><div><b>'+esc(p.wbs)+' · '+esc(p.title)+'</b><div class="muted">'+esc(p.start||'')+' → '+esc(p.end||'')+'</div></div><span class="tag">'+st+'</span></div><div style="margin-top:8px;height:10px;background:#e9edf0;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+Math.max(0,Math.min(100,Number(p.progress)||0))+'%;background:#f2b705"></div></div><div class="muted" style="font-size:11px;margin-top:5px">'+(Number(p.progress)||0)+'% · '+esc(p.owner||'')+(p.dep?' · после '+esc(p.dep):'')+'</div></div>'
+   return '<div class="item"><div style="display:flex;justify-content:space-between;gap:8px"><div><b>'+esc(p.wbs)+' · '+esc(p.title)+'</b><div class="muted">'+esc(p.start||'')+' → '+esc(p.end||'')+'</div></div><span class="tag">'+st+'</span></div><div style="margin-top:8px;height:10px;background:#e9edf0;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+Math.max(0,Math.min(100,Number(p.progress)||0))+'%;background:#f2b705"></div></div><div class="muted" style="font-size:11px;margin-top:5px">'+(Number(p.progress)||0)+'% · '+esc(p.owner||'')+(p.dep?' · после '+esc(p.dep):'')+'</div><button class="btn" style="margin-top:8px;padding:6px 10px" onclick="updatePlanProgress(\''+p.id+'\')">Обновить факт</button></div>'
  }).join('')||'<div class="muted">План пока пуст. Добавьте первый этап.</div>')+'</div>')+
  ganttBoard();
 }
@@ -210,6 +210,24 @@ function addPlan(){
       progress:planItem.progress,
       status:planItem.status
     });
+  }
+
+  save();
+}
+ function updatePlanProgress(id){
+  const p=db.plans.find(x=>x.id===id);
+  if(!p) return;
+
+  const value=prompt('Введите фактическое выполнение, % (0–100):', p.progress||0);
+  if(value===null) return;
+
+  const progress=Math.max(0,Math.min(100,Number(value)||0));
+  p.progress=progress;
+
+  if(progress>=100){
+    p.status='done';
+  }else if(progress>0){
+    p.status='in_progress';
   }
 
   save();
