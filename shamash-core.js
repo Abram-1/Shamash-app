@@ -63,6 +63,7 @@ const SHAMASH_CORE = {
   */
   companies: [],
   projects: [],
+  buildings: [],
 
   /*
     USERS & PERMISSIONS
@@ -358,6 +359,54 @@ function shamashRegisterProject(project) {
 }
 
 window.shamashRegisterProject = shamashRegisterProject;
+/* =========================================================
+   BUILDING REGISTRY
+   Здания внутри строительного проекта
+   ========================================================= */
+
+function shamashRegisterBuilding(building) {
+
+  if (!building || !building.id || !building.projectId || !building.name) {
+    throw new Error(
+      "SHAMASH CORE: здание должно иметь id, projectId и name."
+    );
+  }
+
+  const existingBuilding = SHAMASH_CORE.buildings.find(
+    function (item) {
+      return item.id === building.id;
+    }
+  );
+
+  if (existingBuilding) {
+    return existingBuilding;
+  }
+
+  const coreBuilding = {
+    id: building.id,
+    projectId: building.projectId,
+    name: building.name,
+    status: building.status || "active",
+    createdAt: new Date().toISOString()
+  };
+
+  SHAMASH_CORE.buildings.push(coreBuilding);
+
+  shamashAudit(
+    "BUILDING_REGISTERED",
+    coreBuilding.id,
+    null,
+    {
+      projectId: coreBuilding.projectId
+    }
+  );
+
+  shamashCoreSave();
+
+  return coreBuilding;
+}
+
+window.shamashRegisterBuilding = shamashRegisterBuilding;
 /* =========================================================
    PROJECT SCHEDULE
    Календарное планирование проекта
