@@ -165,6 +165,7 @@ function planning(){
   const deviation=(Number(p.progress)||0)-planned;
   const deviationText=deviation<0?'Отставание':deviation>0?'Опережение':'По плану';
   const warningLevel=deviation>=-5?'Норма':deviation>=-10?'Внимание':'Предупреждение';
+  syncPlanWarning(p, planned, deviation, warningLevel);
 const st=p.status==='done'?'Выполнено':p.status==='blocked'?'Заблокировано':p.status==='in_progress'?'В работе':'Запланировано';
    return '<div class="item"><div style="display:flex;justify-content:space-between;gap:8px"><div><b>'+esc(p.wbs)+' · '+esc(p.title)+'</b><div class="muted">'+esc(p.start||'')+' → '+esc(p.end||'')+'</div></div><span class="tag">'+st+'</span></div><div style="margin-top:8px;height:10px;background:#e9edf0;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+Math.max(0,Math.min(100,Number(p.progress)||0))+'%;background:#f2b705"></div></div><div class="muted" style="font-size:11px;margin-top:5px">План: '+planned+'% · Факт: '+(Number(p.progress)||0)+'% · '+deviationText+': '+Math.abs(deviation)+'% · Контроль: '+warningLevel+' · Ответственный: '+esc(p.owner||'не указан')+(p.dep?' · после '+esc(p.dep):'')+'</div><button class="btn" style="margin-top:8px;padding:6px 10px" onclick="updatePlanProgress(\''+p.id+'\')">Обновить факт</button></div>'
  }).join('')||'<div class="muted">План пока пуст. Добавьте первый этап.</div>')+'</div>')+
@@ -321,6 +322,23 @@ function createProject(){
   }
 
   save();
+}
+ function syncPlanWarning(p, planned, deviation, warningLevel){
+  const existing=db.warnings.find(w=>w.plan_id===p.id);
+  if(!existing && warningLevel!=='Норма'){
+   db.warnings.push({
+  id:crypto.randomUUID(),
+  project_id:p.project_id,
+  building_id:p.building_id||null,
+  plan_id:p.id,
+  trigger_type:'schedule',
+  warning:'Отставание по работе «'+p.title+'»: план '+planned+'%, факт '+(Number(p.progress)||0)+'%, отставание '+Math.abs(deviation)+'%',
+  level:warningLevel,
+  status:'new',
+  at:new Date().toISOString()
+});
+   localStorage.setItem(KEY,JSON.stringify(db));
+}
 }
 function render(tab){current=tab;document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));let h='';if(tab==='dashboard')h=dashboard()+projectSetup();if(tab==='planning')h=planning();if(tab==='protocols')h=protocols();if(tab==='memory')h=memory();if(tab==='tasks')h=tasks();if(tab==='materials')h=generic('materials','Материалы',[{id:'material_name',label:'Материал',ph:'Бетон / блоки / окна...'},{id:'event',label:'Событие',ph:'заказан / получен / израсходован'}]);if(tab==='money')h=generic('money','Деньги',[{id:'type',label:'Тип',ph:'счёт / оплата / прогноз'},{id:'description',label:'За что / описание',ph:'подрядчик / материал / работа...'},{id:'amount',label:'Сумма, ₪',ph:'0'}]);if(tab==='quality')h=generic('quality','Качество',[{id:'title',label:'Дефект / замечание',ph:'Что обнаружено'},{id:'severity',label:'Приоритет',ph:'low / medium / high / critical'}]);if(tab==='safety')h=generic('safety','Безопасность',[{id:'observation',label:'Наблюдение',ph:'Что обнаружено на объекте'},{id:'hazard_level',label:'Уровень',ph:'low / medium / high / critical'}]);if(tab==='warnings')h=generic('warnings','Раннее предупреждение',[{id:'trigger_type',label:'Причина',ph:'schedule / quality / safety / money...'},{id:'warning',label:'Предупреждение',ph:'Что требует внимания'}]);document.getElementById('main').innerHTML=h}
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>render(b.dataset.tab));render('dashboard');
