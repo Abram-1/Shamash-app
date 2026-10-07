@@ -50,6 +50,7 @@ let db=JSON.parse(localStorage.getItem(KEY)||'null')||blank; db.plans=db.plans||
  if(!db.buildings) db.buildings=[];
  if(db.projects[0] && db.buildings.length===0) db.buildings.push({id:crypto.randomUUID(),project_id:db.projects[0].id,name:'Ha-Dror 12',status:'active'});
  if(db.projects[0] && !db.buildings.some(b=>b.project_id===db.projects[0].id && b.name==='Ha-Dror 10')) db.buildings.push({id:crypto.randomUUID(),project_id:db.projects[0].id,name:'Ha-Dror 10',status:'active'});
+ 
 function save(){localStorage.setItem(KEY,JSON.stringify(db));render(current)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 let current='dashboard';
@@ -374,11 +375,24 @@ function createProject(){
   db.projects = [newProject];
  db.buildings = [{id:crypto.randomUUID(),project_id:newProject.id,name:'Ha-Dror 12',status:'active'}];
 
-  if(window.shamashRegisterProject){
-    window.shamashRegisterProject(newProject);
-  }
+ if(window.shamashRegisterProject){
+  window.shamashRegisterProject(newProject);
+}
 
-  save();
+if(window.shamashRegisterBuilding){
+  db.buildings
+    .filter(b=>b.project_id===newProject.id)
+    .forEach(b=>{
+      window.shamashRegisterBuilding({
+        id:b.id,
+        projectId:b.project_id,
+        name:b.name,
+        status:b.status
+      });
+    });
+}
+
+save();
 }
  function syncPlanWarning(p, planned, deviation, warningLevel){
   const existing=db.warnings.find(w=>w.plan_id===p.id);
@@ -401,5 +415,19 @@ function render(tab){current=tab;document.querySelectorAll('#nav button').forEac
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>render(b.dataset.tab));render('dashboard');
 </script>
  <script src="shamash-core.js"></script>
+ <script>
+if(window.shamashRegisterBuilding && db.projects[0]){
+  db.buildings
+    .filter(b=>b.project_id===db.projects[0].id)
+    .forEach(b=>{
+      window.shamashRegisterBuilding({
+        id:b.id,
+        projectId:b.project_id,
+        name:b.name,
+        status:b.status
+      });
+    });
+}
+</script>
 </body>
 </html>
