@@ -116,6 +116,7 @@ function addRecord(){
   if(window.shamashCreateRecord && window.shamashAddToProjectMemory){
     const coreRecord=window.shamashCreateRecord({
       projectId:projectId,
+     buildingId:building()?.id||null,
       type:type,
       title:text,
       data:{
