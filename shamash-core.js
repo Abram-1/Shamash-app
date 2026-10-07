@@ -130,6 +130,7 @@ const SHAMASH_CORE = {
 
 function shamashCreateRecord({
   projectId = null,
+  buildingId = null,
   type,
   title,
   data = {},
@@ -147,6 +148,7 @@ function shamashCreateRecord({
       Math.random().toString(36).slice(2, 8),
 
     projectId,
+    buildingId,
     type,
     title,
     data,
@@ -172,7 +174,6 @@ function shamashCreateRecord({
 /* =========================================================
    PROJECT MEMORY
    ========================================================= */
-
 function shamashAddToProjectMemory(record) {
 
   if (!record || !record.type || !record.title) {
