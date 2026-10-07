@@ -493,6 +493,7 @@ function shamashAddTask(task) {
   const coreTask = {
     id: task.id,
     projectId: task.projectId,
+    buildingId: task.buildingId || null,
     title: task.title,
     owner: task.owner || "",
     status: task.status || "planned",
