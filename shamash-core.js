@@ -434,6 +434,7 @@ function shamashAddScheduleItem(item) {
   const coreScheduleItem = {
     id: item.id,
     projectId: item.projectId,
+    buildingId: item.buildingId || null,
     wbs: item.wbs || "",
     title: item.title,
     start: item.start || null,
