@@ -220,10 +220,11 @@ function addPlan(){
   db.plans.push(planItem);
 
   if(window.shamashAddScheduleItem && planItem.project_id){
-    window.shamashAddScheduleItem({
-      id:planItem.id,
-      projectId:planItem.project_id,
-      wbs:planItem.wbs,
+   window.shamashAddScheduleItem({
+  id:planItem.id,
+  projectId:planItem.project_id,
+  buildingId:planItem.building_id||null,
+  wbs:planItem.wbs,
       title:planItem.title,
       start:planItem.start,
       end:planItem.end,
