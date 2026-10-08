@@ -353,6 +353,7 @@ function addTask(){
     window.shamashAddTask({
       id:taskItem.id,
       projectId:projectId,
+      buildingId:taskItem.building_id||null,
       title:taskItem.title,
       owner:taskItem.owner,
       status:taskItem.status,
