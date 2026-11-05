@@ -1,0 +1,46 @@
+name: SHAMASH isolated static checks
+
+on:
+  push:
+    branches:
+      - automation/shamash-ci-setup-01
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-contract:
+    name: Read-only repository smoke check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify repository entrypoints (no build or deployment)
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const required = ['index.html', 'app.js', 'orchestrator.html', 'shamash-core.js'];
+          for (const file of required) {
+            if (!fs.existsSync(file)) {
+              console.error('MISSING:', file);
+              process.exitCode = 1;
+            } else {
+              console.log('FOUND:', file);
+            }
+          }
+          if (fs.existsSync('orchestrator.html')) {
+            const html = fs.readFileSync('orchestrator.html', 'utf8');
+            if (!html.includes('shamash-core.js')) {
+              console.error('MISSING: orchestrator.html reference to shamash-core.js');
+              process.exitCode = 1;
+            } else {
+              console.log('FOUND: orchestrator CORE reference');
+            }
+          }
+          console.log('Scope: structural smoke check only; no runtime, integration, safety or production readiness assertion.');
+          NODE
