@@ -35,9 +35,15 @@ function auditRequest(sha, ciURL) {
     restrictions: ['Independent Claude execution required', 'No code changes', 'No paid API', 'No secrets', 'No main or merge'],
     state: 'AWAITING_CLAUDE', automatic_corrections_enabled: false, correction_attempts: 0 };
 }
+function validateContext(command, branch, env, head) {
+  if (command === 'ci') {
+    // actions/checkout with an exact SHA deliberately produces a detached HEAD.
+    if (env.GITHUB_REPOSITORY !== REPO || env.GITHUB_REF !== 'refs/heads/' + BRANCH ||
+        !/^[0-9a-f]{40}$/.test(env.GITHUB_SHA || '') || head !== env.GITHUB_SHA) throw Error('CI_IDENTITY_REJECTED');
+  } else if (branch !== BRANCH) throw Error('BRANCH_SCOPE_REJECTED');
+}
 async function main(command) {
   validateTask(task);
-  if (git('branch', '--show-current') !== BRANCH) throw Error('BRANCH_SCOPE_REJECTED');
   const dir = path.join(__dirname, 'runs'); fs.mkdirSync(dir, { recursive: true });
   const lock = path.join(dir, 'worker.lock');
   let fd;
@@ -48,6 +54,7 @@ async function main(command) {
   const setState = value => { save(stateFile, value); event(value); return value; };
   try {
     event({ stage: command, event: 'STARTED', task_id: task.task_id });
+    validateContext(command, git('branch', '--show-current'), process.env, git('rev-parse', 'HEAD'));
     if (command === 'codex' || command === 'retry-codex') {
       const prior = fs.existsSync(stateFile) ? safeRead(stateFile) : null;
       const attempts = prior && prior.codex_invoked ? (prior.invocation_attempts || 1) : 0;
@@ -97,7 +104,7 @@ async function main(command) {
     throw error;
   } finally { fs.closeSync(fd); fs.unlinkSync(lock); }
 }
-module.exports = { validateTask, validateCodeResult, auditRequest, hash, task };
+module.exports = { validateTask, validateCodeResult, validateContext, auditRequest, hash, task };
 if (require.main === module) main(process.argv[2] || 'status').then(r => {
   console.log(JSON.stringify(r, null, 2)); if (r.stage === 'BLOCKED') process.exitCode = 2;
 }).catch(e => { console.error(e.message); process.exitCode = 2; });

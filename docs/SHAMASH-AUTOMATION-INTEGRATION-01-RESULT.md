@@ -17,3 +17,6 @@ Limitations: GitHub artifact retention 14 days; local logs retained separately. 
 NOT VERIFIED: Claude execution/auth/costs, actual independent verdict, findings return, unattended task scheduling, ChatGPT automatic report delivery, production security, legal sufficiency, integration readiness. No secrets, new account permissions, deployments, merges or paid APIs configured. Protected stops remain.
 
 Existing project history/master register is not modified outside task scope. This report is scoped evidence for later registration, not a replacement register.
+
+### CI finding and correction
+First remote run https://github.com/Abram-1/Shamash-app/actions/runs/42214928025 at 0e2b2cc65249f3a7690f141e9418c8bc6896563f: existing smoke and five bridge test groups PASS; evidence handoff FAIL with BRANCH_SCOPE_REJECTED. Root cause: exact-SHA actions/checkout correctly creates a detached HEAD, while the pilot incorrectly required a named local branch. Failure logs and first artifact are retained. Correction: CI validates repository + allowed GITHUB_REF + full GITHUB_SHA matching HEAD; local agent commands still require the named isolated branch. Added a regression test accepting detached exact-SHA checkout and rejecting main/wrong SHA. No guard was removed or scope expanded. Final bridge suite now has six groups.

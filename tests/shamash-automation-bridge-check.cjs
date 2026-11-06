@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const { validateTask, validateCodeResult, auditRequest, hash, task } = require('../automation/bridge.cjs');
+const { validateTask, validateCodeResult, validateContext, auditRequest, hash, task } = require('../automation/bridge.cjs');
 const results = [];
 function test(name, fn) { try { fn(); results.push({ name, status: 'PASS' }); } catch (e) { results.push({ name, status: 'FAIL', reason: e.message }); } }
 test('Owner synthetic task; reject real data, scope expansion and retry expansion', () => {
@@ -19,6 +19,13 @@ test('Exact immutable task and CI provenance; reject wrong SHA or repository', (
   assert.equal(request.state, 'AWAITING_CLAUDE'); assert.equal(request.automatic_corrections_enabled, false);
   assert.throws(() => auditRequest('main', request.ci_url));
   assert.throws(() => auditRequest('a'.repeat(40), 'https://github.com/other/repo/actions/runs/123'));
+});
+test('Exact-SHA detached CI checkout accepted; foreign context rejected', () => {
+  const sha = 'a'.repeat(40), env = { GITHUB_REPOSITORY: 'Abram-1/Shamash-app', GITHUB_REF: 'refs/heads/automation/shamash-ci-setup-01', GITHUB_SHA: sha };
+  validateContext('ci', '', env, sha);
+  assert.throws(() => validateContext('ci', '', { ...env, GITHUB_REF: 'refs/heads/main' }, sha));
+  assert.throws(() => validateContext('ci', '', env, 'b'.repeat(40)));
+  assert.throws(() => validateContext('codex', 'main', env, sha));
 });
 test('Real Codex-generated synthetic code and proof hash', () => {
   const code = fs.readFileSync(path.join(__dirname, '../automation/synthetic/sum.cjs'), 'utf8');
