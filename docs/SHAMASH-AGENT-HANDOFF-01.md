@@ -31,3 +31,26 @@ Status: DRAFT / NOT ACTIVE. Owner's request: reduce manual transfer between Chat
 
 ## Next verifiable milestone
 Document a zero-secrets proof of handoff format and independently check the existing workflow's actual steps. Propose (but do not activate) a minimal isolated integration only after the invocation methods are confirmed.
+
+## AUTOMATION INTEGRATION 01 — implementation addendum, 2026-11-06
+
+This append-only update supersedes only the earlier statements that no callable Codex integration is confirmed. Historical baseline and all gates remain.
+
+Verified locally: Codex CLI 0.166.0-alpha.6, logged in using ChatGPT, real read-only ephemeral synthetic invocation. First restricted attempt failed during app-server initialization; one technical retry with normal host access succeeded. No API key created or transferred. Existing subscription quota is used; available remaining quota and any future overage costs are NOT VERIFIED.
+
+Implementation: automation/bridge.cjs, owner-scoped task.json, exact output proof and event receipt, synthetic function, tests/shamash-automation-bridge-check.cjs, additions to the existing static-checks workflow. Command `node automation/bridge.cjs codex` makes at most one initial invocation; `retry-codex` allows only one explicit technical retry after a blocked attempt. There is no automatic correction execution in this milestone (zero <= maximum two). No generated code is run in the bridge; its output is tested separately in a bounded VM. Regex screening is defense in depth, not a general-purpose security sandbox.
+
+Existing isolated branch is reused; no main work or arbitrary task ingestion. One local worker lock, one serialized GitHub workflow, no concurrent AI workers. The sole executable task is the synthetic sum fixture. Broader tasks require a separately approved scope and implementation.
+
+GitHub automatically checks the exact commit, validates output against proof, emits a Claude request tied to GITHUB_SHA/run URL, and retains state, events, tests and the request as a 14-day artifact. Successful CI is PARTIAL_PASS only; Claude remains BLOCKED / NOT_REVIEWED. Job summary reports this explicitly. No Claude verdict is fabricated.
+
+Recovery: inspect automation/runs/state.json and events.jsonl. Log files from the first technical attempt are retained with .attempt1 suffix. A stale worker.lock must be checked against its PID before removal; never delete an active lock. Do not automatically retry completed tasks or expand the retry limit. A failed receipt write leaves .tmp evidence and must be investigated. Code output uses exclusive file creation to prevent overwriting an existing result. A GitHub retry creates a new run-attempt artifact; it does not start an AI or new task.
+
+Actual Claude bridge, bidirectional findings return, autonomous corrections and automatic delivery into a ChatGPT chat are NOT CONNECTED. Claude CLI is absent from PATH and checked standard Windows locations. No auth or budget is assumed. Owner's minimum next action is to provide an installed, authorized Claude Code execution route and clarify permitted subscription usage without paid API/new secrets. Then audit this exact candidate with the generated request, before enabling further workflow.
+
+Official invocation references:
+- https://developers.openai.com/codex/noninteractive (codex exec)
+- https://code.claude.com/docs/en/headless (claude -p; bare mode requires API auth and is excluded here)
+- https://docs.github.com/en/actions/tutorials/store-and-share-data (immutable workflow artifacts)
+
+No overall PASS until real Codex -> GitHub -> Claude -> report evidence is available. Gate A BLOCKED; CM33 HARD STOP; Agent D BLOCKED; BD-03 STOP.

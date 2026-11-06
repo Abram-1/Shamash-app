@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "task_id": "DEMO-AUTOMATION-001",
+  "agent": "Codex CLI",
+  "version": "codex-cli 0.166.0-alpha.6",
+  "base_commit_sha": "9102e066e30606c6fc07e6b24c9268e53a398ffe",
+  "code_sha256": "930396ffde4f42c001016fee43c0d7dadba982f32d704d123e5ef0b9ca26fced",
+  "events_sha256": "7d5dcc19ae76e5e93dea4cc3c38495e2d83812242ff40d294bda2918a587d254",
+  "exit_code": 0,
+  "independent_review": "NOT_REVIEWED"
+}

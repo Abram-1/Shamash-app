@@ -1,0 +1,12 @@
+{
+  "task_id": "DEMO-AUTOMATION-001",
+  "source": "Owner AUTOMATION INTEGRATION 01, 2026-11-06, current chat",
+  "branch": "automation/shamash-ci-setup-01",
+  "allowed_files": ["automation/synthetic/sum.cjs"],
+  "forbidden": ["main", "deployment", "real data", "secrets", "payments", "merge"],
+  "acceptance_checks": ["Export a pure syntheticSum(a,b) for two safe integers; reject unsafe input and unsafe sum"],
+  "test_data": "synthetic",
+  "requires_owner_approval_for_merge": true,
+  "max_correction_attempts": 2,
+  "max_parallel_workers": 1
+}

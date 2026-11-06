@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: shamash-synthetic-agent-pilot
+  cancel-in-progress: false
+
 jobs:
   static-contract:
     name: Read-only repository smoke check
@@ -46,4 +50,44 @@ jobs:
             }
           }
           console.log('Scope: structural smoke check only; no runtime, integration, safety or production readiness assertion.');
+          NODE
+
+  agent-handoff:
+    name: Exact-SHA evidence and Claude handoff readiness
+    needs: static-contract
+    if: ${{ always() && github.ref == 'refs/heads/automation/shamash-ci-setup-01' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout immutable audited candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Validate bridge and actual synthetic Codex output
+        id: bridge-tests
+        run: node tests/shamash-automation-bridge-check.cjs
+      - name: Preserve exact-SHA request and explicit Claude blocker
+        if: ${{ always() }}
+        env:
+          STATIC_OUTCOME: ${{ needs.static-contract.result }}
+          BRIDGE_OUTCOME: ${{ steps.bridge-tests.outcome }}
+        run: node automation/bridge.cjs ci
+      - name: Save evidence for recovery and independent audit
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: shamash-agent-handoff-${{ github.sha }}-${{ github.run_attempt }}
+          path: automation/runs/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Owner summary (never a Claude PASS)
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const file = 'automation/runs/state.json';
+          const state = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '{"stage":"BLOCKED","reason":"receipt unavailable"}';
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## SHAMASH synthetic handoff\n\nClaude: BLOCKED / NOT_REVIEWED. No merge or payment authorization.\n\n```json\n' + state + '\n```\n');
           NODE

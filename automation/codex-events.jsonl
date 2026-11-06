@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a1b0bb-03c4-7422-ba24-ec33dd609027"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"task_id\":\"DEMO-AUTOMATION-001\",\"code\":\"function syntheticSum(a, b) {\\n  if (!Number.isSafeInteger(a) || !Number.isSafeInteger(b)) {\\n    throw new RangeError('Inputs must be safe integers');\\n  }\\n  const sum = a + b;\\n  if (!Number.isSafeInteger(sum)) {\\n    throw new RangeError('Sum must be a safe integer');\\n  }\\n  return sum;\\n}\\nmodule.exports={syntheticSum};\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":17425,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":123,"reasoning_output_tokens":0}}
