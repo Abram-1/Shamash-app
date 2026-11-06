@@ -26,6 +26,10 @@ jobs:
       - name: Validate synthetic agent handoff contract (no agents invoked)
         shell: bash
         run: node tests/shamash-agent-exchange-check.cjs
+      - name: Validate versioned exchange records and hash-linked history (no AI)
+        run: node automation/exchange/exchange.cjs check
+      - name: Test local exchange replay and scope protection (no AI)
+        run: node tests/shamash-github-exchange-check.cjs
       - name: Verify repository entrypoints (no build or deployment)
         shell: bash
         run: |

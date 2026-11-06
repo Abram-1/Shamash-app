@@ -1,0 +1,110 @@
+{
+  "mode": "SIMULATED_NOT_AN_AGENT_RUN",
+  "records": [
+    {
+      "protocol": "SHAMASH_AGENT_EXCHANGE_V1",
+      "schema_version": 1,
+      "task_id": "DEMO-AUTOMATION-001",
+      "commit_sha": "ab1ba30e2dbcfad1e8c201395bdfd02113f13a65",
+      "data_classification": "SYNTHETIC",
+      "owner_decision": "REQUIRED_NOT_GRANTED",
+      "record_id": "EXCHANGE-TASK-001",
+      "kind": "task",
+      "producer": {
+        "id": "chatgpt",
+        "role": "coordinator"
+      },
+      "recipient": {
+        "id": "codex",
+        "role": "implementer"
+      },
+      "status": "PROPOSED",
+      "payload": {
+        "allowed_actions": [
+          "READ_SYNTHETIC",
+          "REPORT"
+        ],
+        "allowed_files": [
+          "automation/synthetic/sum.cjs"
+        ],
+        "acceptance_checks": [
+          "Validate exchange structure only; no agent invocation or owner approval"
+        ],
+        "reviewer": {
+          "id": "claude",
+          "role": "reviewer"
+        },
+        "authorization_ref": "Owner GITHUB EXCHANGE 01, current chat: local synthetic preparation only"
+      }
+    },
+    {
+      "protocol": "SHAMASH_AGENT_EXCHANGE_V1",
+      "schema_version": 1,
+      "task_id": "DEMO-AUTOMATION-001",
+      "commit_sha": "ab1ba30e2dbcfad1e8c201395bdfd02113f13a65",
+      "data_classification": "SYNTHETIC",
+      "owner_decision": "REQUIRED_NOT_GRANTED",
+      "record_id": "EXCHANGE-CODEX-RESULT-001",
+      "kind": "implementation_result",
+      "producer": {
+        "id": "codex",
+        "role": "implementer"
+      },
+      "recipient": {
+        "id": "claude",
+        "role": "reviewer"
+      },
+      "status": "READY_FOR_INDEPENDENT_REVIEW",
+      "payload": {
+        "task_record_id": "EXCHANGE-TASK-001",
+        "changed_files": [],
+        "tests": [
+          {
+            "name": "Fixture delivery example; no agent test performed",
+            "result": "NOT_RUN",
+            "evidence_ref": "fixture:SIMULATED_NOT_AN_AGENT_RUN"
+          }
+        ],
+        "limitations": [
+          "Synthetic exchange example, not a new Codex execution receipt"
+        ],
+        "execution_provenance": "SIMULATED_NOT_AN_AGENT_RUN"
+      }
+    },
+    {
+      "protocol": "SHAMASH_AGENT_EXCHANGE_V1",
+      "schema_version": 1,
+      "task_id": "DEMO-AUTOMATION-001",
+      "commit_sha": "ab1ba30e2dbcfad1e8c201395bdfd02113f13a65",
+      "data_classification": "SYNTHETIC",
+      "owner_decision": "REQUIRED_NOT_GRANTED",
+      "record_id": "EXCHANGE-CLAUDE-REVIEW-001",
+      "kind": "independent_review",
+      "producer": {
+        "id": "claude",
+        "role": "reviewer"
+      },
+      "recipient": {
+        "id": "chatgpt",
+        "role": "coordinator"
+      },
+      "status": "BLOCKED",
+      "payload": {
+        "implementation_record_id": "EXCHANGE-CODEX-RESULT-001",
+        "verdict": "BLOCKED",
+        "findings": [
+          {
+            "severity": "BLOCKING",
+            "evidence": "No actual independent Claude execution is part of GITHUB EXCHANGE 01",
+            "recommendation": "Keep NOT_REVIEWED until a separately authorized real review has authentic evidence"
+          }
+        ],
+        "limitations": [
+          "This record demonstrates structure and routing only"
+        ],
+        "execution_provenance": "SIMULATED_NOT_AN_AGENT_RUN",
+        "independence_status": "NOT_VERIFIED"
+      }
+    }
+  ]
+}
