@@ -1,7 +1,7 @@
 'use strict';
 // Extends SHAMASH-AGENT-EXCHANGE-01. No AI, network, git mutation or owner decisions.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
-const schema=JSON.parse(fs.readFileSync(path.join(__dirname,'schema.json'),'utf8'));
+let schema;
 const zero='0'.repeat(64),maxBytes=2*1024*1024;
 function insist(ok,code){if(!ok)throw Error(code);}
 function canonical(v){if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';if(v&&typeof v==='object')return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonical(v[k])).join(',')+'}';return JSON.stringify(v);}
@@ -16,7 +16,11 @@ function checkSchema(s,depth=0){
   if(s.type)insist(['object','array','string','integer'].includes(s.type),'SCHEMA_TYPE_UNSUPPORTED');
   for(const child of [...Object.values(s.properties||{}),...Object.values(s.$defs||{}),...(s.oneOf||[]),...(s.items?[s.items]:[])])checkSchema(child,depth+1);
 }
-checkSchema(schema);
+function loadSchema() {
+  const document = JSON.parse(readFile(path.join(__dirname, 'schema.json')));
+  checkSchema(document);
+  return document;
+}
 function matches(s,v,depth=0){
   if(depth>40)return false;
   if(s.$ref){const name=s.$ref.replace('#/$defs/','');return s.$ref==='#/$defs/'+name&&Object.hasOwn(schema.$defs,name)&&matches(schema.$defs[name],v,depth+1);}
@@ -133,7 +137,72 @@ function checkFixtures(){
   const fixture=JSON.parse(readFile(path.join(__dirname,'fixtures.json'))),events=readHistory(path.join(__dirname,'history.jsonl'));
   insist(fixture.mode==='SIMULATED_NOT_AN_AGENT_RUN','FIXTURE_PROVENANCE');
   const state=validateBundle(fixture.records,events);
-  return {status:'STRUCTURE_PASS_ONLY',records:state.records.size,events:events.length,head:state.head,independent_audit:'NOT_REVIEWED',owner_decision:state.owner_decision};
+  const kinds = new Set(fixture.records.map(record => record.kind));
+  insist(state.records.size === 3 && ['task', 'implementation_result', 'independent_review'].every(kind => kinds.has(kind)), 'EXPECTED_HANDOFF_CHAIN');
+  // validateBundle verifies the result-to-task and review-to-result links, including their IDs and SHAs.
+  const task = fixture.records.find(record => record.kind === 'task');
+  return {
+    status: 'STRUCTURE_PASS_ONLY',
+    task_id: task.task_id,
+    data_commit_sha: task.commit_sha,
+    records: state.records.size,
+    events: events.length,
+    head: state.head,
+    independent_audit: 'NOT_REVIEWED',
+    owner_decision: state.owner_decision
+  };
 }
-module.exports={schema,canonical,hash,eventDigest,makeEvent,validateShape,validateRecord,validateBundle,loadStore,publish,acknowledge,checkFixtures};
-if(require.main===module){try{insist(process.argv.length===2||process.argv[2]==='check','CHECK_ONLY_CLI');console.log(JSON.stringify(checkFixtures(),null,2));}catch{console.error('EXCHANGE_STRUCTURE_BLOCKED');process.exitCode=1;}}
+
+// The owner supplies this reference outside the candidate checkout. Its publication
+// SHA also identifies the validator and workflow that the owner has approved.
+function readTrustReference(raw) {
+  insist(typeof raw === 'string' && raw.trim() !== '', 'TRUST_REFERENCE_MISSING');
+  let reference;
+  try {
+    reference = JSON.parse(raw);
+  } catch {
+    throw Error('TRUST_REFERENCE_INVALID');
+  }
+  const fields = ['publication_commit_sha', 'task_id', 'data_commit_sha', 'head'];
+  insist(reference && typeof reference === 'object' && !Array.isArray(reference)
+    && Object.keys(reference).length === fields.length
+    && fields.every(field => Object.hasOwn(reference, field) && typeof reference[field] === 'string')
+    && /^[0-9a-f]{40}$/.test(reference.publication_commit_sha)
+    && /^[A-Z][A-Z0-9_-]{2,63}$/.test(reference.task_id)
+    && /^[0-9a-f]{40}$/.test(reference.data_commit_sha)
+    && /^[0-9a-f]{64}$/.test(reference.head), 'TRUST_REFERENCE_INVALID');
+  return reference;
+}
+
+if (require.main === module) {
+  const publicationSha = process.env.GITHUB_SHA ?? null;
+  const report = {
+    schema_version: 1,
+    scope: 'SYNTHETIC_HANDOFF_VALIDATION',
+    publication_commit_sha: /^[0-9a-f]{40}$/.test(publicationSha ?? '') ? publicationSha : null,
+    data_commit_sha: null,
+    independent_audit: 'NOT_REVIEWED',
+    owner_decision: 'REQUIRED_NOT_GRANTED'
+  };
+  try {
+    insist(process.argv.length === 2 || (process.argv.length === 3 && process.argv[2] === 'check'), 'CHECK_ONLY_CLI');
+    insist(publicationSha === null ? process.env.GITHUB_ACTIONS !== 'true' : report.publication_commit_sha !== null, 'PUBLICATION_SHA_INVALID');
+    const reference = readTrustReference(process.env.SHAMASH_HANDOFF_REFERENCE);
+    insist(reference.publication_commit_sha === report.publication_commit_sha, 'TRUST_PUBLICATION_UNAPPROVED');
+    schema = loadSchema();
+    Object.assign(report, checkFixtures());
+    insist(report.task_id === reference.task_id, 'REFERENCE_TASK_ID_MISMATCH');
+    insist(report.data_commit_sha === reference.data_commit_sha, 'REFERENCE_DATA_SHA_MISMATCH');
+    insist(report.head === reference.head, 'REFERENCE_HISTORY_HEAD_MISMATCH');
+    report.result = 'PASS';
+  } catch (error) {
+    const code = /^[A-Z][A-Z0-9_]{2,63}$/.test(error.message) ? error.message : 'HANDOFF_INPUT_INVALID';
+    const result = ['TRUST_REFERENCE_MISSING', 'TRUST_REFERENCE_INVALID', 'TRUST_PUBLICATION_UNAPPROVED'].includes(code) ? 'BLOCKED' : 'FAIL';
+    Object.assign(report, {status: result, result, error_code: code});
+    process.exitCode = 1;
+  }
+  console.log(JSON.stringify(report, null, 2));
+} else {
+  schema = loadSchema();
+  module.exports={schema,canonical,hash,eventDigest,makeEvent,validateShape,validateRecord,validateBundle,loadStore,publish,acknowledge,checkFixtures};
+}

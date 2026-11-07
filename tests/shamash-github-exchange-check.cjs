@@ -1,5 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {spawnSync} = require('node:child_process');
 const e=require('../automation/exchange/exchange.cjs');
 const fixture=require('../automation/exchange/fixtures.json');
 const scratch=fs.mkdtempSync(path.join(__dirname,'exchange-test-'));
@@ -8,7 +9,122 @@ function test(name,fn){try{fn();tests.push({name,status:'PASS'});}catch(error){t
 function eventsFor(records){const out=[];for(const r of records)out.push(e.makeEvent(out,r,'RECORD_ADDED',r.recipient.id));return out;}
 function verify(records){return e.validateBundle(records,eventsFor(records));}
 function store(name){return path.join(scratch,name);}
+const publicationSha = 'e38f872095aec3f2ef8ae1f6bfc1b470a8a1d370';
+// A separate test reference, kept unchanged when fixtures and history are rewritten.
+const trustReference = Object.freeze({
+  publication_commit_sha: publicationSha,
+  task_id: 'DEMO-AUTOMATION-001',
+  data_commit_sha: 'ab1ba30e2dbcfad1e8c201395bdfd02113f13a65',
+  head: '9309de377b9bd7a232be2c67c12216621b0e8da24a17cb399b079ce201b0fb3b'
+});
+function runCheck(name, edit = () => {}, sha = publicationSha, reference = JSON.stringify(trustReference)) {
+  const dir = store(name);
+  fs.mkdirSync(dir);
+  for (const file of ['exchange.cjs', 'schema.json', 'fixtures.json', 'history.jsonl']) {
+    fs.copyFileSync(path.join(__dirname, '../automation/exchange', file), path.join(dir, file));
+  }
+  edit(dir);
+  const env = {...process.env, GITHUB_ACTIONS: 'true', GITHUB_SHA: sha, SHAMASH_HANDOFF_REFERENCE: reference};
+  if (sha === null) delete env.GITHUB_SHA;
+  if (reference === null) delete env.SHAMASH_HANDOFF_REFERENCE;
+  const run = spawnSync(process.execPath, [path.join(dir, 'exchange.cjs'), 'check'], {env, encoding: 'utf8'});
+  if (run.error) throw run.error;
+  return {exitCode: run.status, report: JSON.parse(run.stdout)};
+}
+function rewriteFixture(dir, records) {
+  fs.writeFileSync(path.join(dir, 'fixtures.json'), JSON.stringify({...fixture, records}));
+  fs.writeFileSync(path.join(dir, 'history.jsonl'), eventsFor(records).map(event => JSON.stringify(event)).join('\n') + '\n');
+}
+function assertFailedCheck(run, code, dataSha = null) {
+  assert.equal(run.exitCode, 1);
+  assert.equal(run.report.result, 'FAIL');
+  assert.equal(run.report.error_code, code);
+  assert.equal(run.report.data_commit_sha, dataSha);
+  assert.equal(run.report.independent_audit, 'NOT_REVIEWED');
+}
 try{
+  test('CI report separates publication SHA from validated synthetic data SHA', () => {
+    const {exitCode, report} = runCheck('ci-pass');
+    assert.equal(exitCode, 0);
+    assert.equal(report.result, 'PASS');
+    assert.equal(report.status, 'STRUCTURE_PASS_ONLY');
+    assert.equal(report.publication_commit_sha, publicationSha);
+    assert.equal(report.data_commit_sha, 'ab1ba30e2dbcfad1e8c201395bdfd02113f13a65');
+    assert.equal(report.task_id, 'DEMO-AUTOMATION-001');
+    assert.equal(report.independent_audit, 'NOT_REVIEWED');
+    assert.equal(report.owner_decision, 'REQUIRED_NOT_GRANTED');
+    assert.match(report.head, /^[0-9a-f]{64}$/);
+  });
+  test('CI rejects mismatched task ID or data SHA even with a rebuilt history', () => {
+    for (const [field, value] of [['task_id', 'OTHER-TASK'], ['commit_sha', 'a'.repeat(40)]]) {
+      const run = runCheck('ci-mismatch-' + field, dir => {
+        const records = clone(fixture.records);
+        records[2][field] = value;
+        rewriteFixture(dir, records);
+      });
+      assertFailedCheck(run, 'TASK_SHA_LINK');
+    }
+  });
+  test('CI requires the complete three-record chain', () => {
+    assertFailedCheck(runCheck('ci-missing-review', dir => rewriteFixture(dir, fixture.records.slice(0, 2))), 'EXPECTED_HANDOFF_CHAIN');
+  });
+  test('CI reports damaged history and schema as machine-readable failures', () => {
+    assertFailedCheck(runCheck('ci-tampered-history', dir => {
+      const file = path.join(dir, 'history.jsonl');
+      const events = fs.readFileSync(file, 'utf8').trim().split(/\r?\n/).map(line => JSON.parse(line));
+      events[0].event_hash = 'f'.repeat(64);
+      fs.writeFileSync(file, events.map(event => JSON.stringify(event)).join('\n') + '\n');
+    }), 'HISTORY_CHAIN');
+    assertFailedCheck(runCheck('ci-invalid-schema', dir => {
+      fs.writeFileSync(path.join(dir, 'schema.json'), '{');
+    }), 'HANDOFF_INPUT_INVALID');
+  });
+  test('CI requires a valid publication SHA', () => {
+    assertFailedCheck(runCheck('ci-no-sha', undefined, null), 'PUBLICATION_SHA_INVALID');
+    assertFailedCheck(runCheck('ci-invalid-sha', undefined, 'main'), 'PUBLICATION_SHA_INVALID');
+  });
+  test('CI blocks missing or invalid references and unapproved publication commits', () => {
+    for (const [name, sha, reference, code] of [
+      ['missing', publicationSha, null, 'TRUST_REFERENCE_MISSING'],
+      ['empty', publicationSha, '', 'TRUST_REFERENCE_MISSING'],
+      ['invalid', publicationSha, '{', 'TRUST_REFERENCE_INVALID'],
+      ['unapproved', 'a'.repeat(40), JSON.stringify(trustReference), 'TRUST_PUBLICATION_UNAPPROVED']
+    ]) {
+      const {exitCode, report} = runCheck('ci-reference-' + name, undefined, sha, reference);
+      assert.equal(exitCode, 1);
+      assert.equal(report.result, 'BLOCKED');
+      assert.equal(report.error_code, code);
+      assert.equal(report.independent_audit, 'NOT_REVIEWED');
+    }
+  });
+  test('CI rejects coordinated replacement of all data SHAs or task IDs with a rebuilt history', () => {
+    for (const [field, value, code, dataSha] of [
+      ['commit_sha', 'a'.repeat(40), 'REFERENCE_DATA_SHA_MISMATCH', 'a'.repeat(40)],
+      ['task_id', 'OTHER-TASK', 'REFERENCE_TASK_ID_MISMATCH', trustReference.data_commit_sha]
+    ]) {
+      const run = runCheck('ci-coordinated-' + field, dir => {
+        const records = clone(fixture.records);
+        for (const record of records) record[field] = value;
+        const file = path.join(dir, 'history.jsonl');
+        const originalEvents = fs.readFileSync(file, 'utf8').trim().split(/\r?\n/).map(line => JSON.parse(line));
+        const events = [];
+        for (const original of originalEvents) {
+          const record = records.find(item => item.record_id === original.record_id);
+          events.push(e.makeEvent(events, record, original.type, original.consumer_id));
+        }
+        // Confirm that internal structure still passes before applying the external reference.
+        e.validateBundle(records, events);
+        fs.writeFileSync(path.join(dir, 'fixtures.json'), JSON.stringify({...fixture, records}));
+        fs.writeFileSync(file, events.map(event => JSON.stringify(event)).join('\n') + '\n');
+      });
+      assertFailedCheck(run, code, dataSha);
+      assert.equal(run.report.publication_commit_sha, publicationSha);
+    }
+  });
+  test('CI rejects a shortened but internally valid history', () => {
+    const run = runCheck('ci-short-history', dir => rewriteFixture(dir, fixture.records));
+    assertFailedCheck(run, 'REFERENCE_HISTORY_HEAD_MISMATCH', trustReference.data_commit_sha);
+  });
   test('Three distinct versioned formats; exact-SHA links; no real-agent claim',()=>{
     const r=e.checkFixtures();assert.equal(r.records,3);assert.equal(r.events,5);assert.equal(r.owner_decision,'REQUIRED_NOT_GRANTED');assert.equal(r.independent_audit,'NOT_REVIEWED');
   });

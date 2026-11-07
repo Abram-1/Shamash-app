@@ -23,11 +23,25 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Validate versioned exchange records and hash-linked history (no AI)
+        id: handoff-validation
+        shell: bash
+        # Owner-managed Actions variable. Required JSON keys: publication_commit_sha,
+        # task_id, data_commit_sha, head. No checkout-provided fallback.
+        env:
+          SHAMASH_HANDOFF_REFERENCE: ${{ vars.SHAMASH_HANDOFF_REFERENCE }}
+        run: node automation/exchange/exchange.cjs check | tee "$RUNNER_TEMP/shamash-handoff-validation.json"
+      - name: Save synthetic handoff validation report
+        if: ${{ always() && (steps.handoff-validation.outcome == 'success' || steps.handoff-validation.outcome == 'failure') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: shamash-handoff-validation-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/shamash-handoff-validation.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Validate synthetic agent handoff contract (no agents invoked)
         shell: bash
         run: node tests/shamash-agent-exchange-check.cjs
-      - name: Validate versioned exchange records and hash-linked history (no AI)
-        run: node automation/exchange/exchange.cjs check
       - name: Test local exchange replay and scope protection (no AI)
         run: node tests/shamash-github-exchange-check.cjs
       - name: Verify repository entrypoints (no build or deployment)
