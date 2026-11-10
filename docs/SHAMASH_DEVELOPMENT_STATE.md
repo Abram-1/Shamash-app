@@ -36,3 +36,14 @@ Status: checkpoint of confirmed discussion and Codex reports. This file does not
 - ChatGPT reviews results; owner retains final decision.
 - Do not restart architecture or repeat confirmed tests without reason.
 - This checkpoint contains no personal local paths, secrets or credentials.
+
+## 2026-11-10 — Workstream A visual verification (reported and screenshot-observed)
+- Codex reported 7 PASS / 0 FAIL for the synthetic finance demo using Node.js simulated DOM; no browser validation was completed by Codex at that time.
+- Owner opened a local finance-demo correction-01 index.html in Chrome and provided screenshots.
+- Initial visible values: performed 100 m² × 80 ILS = 8,000 ILS; accepted 80 m² × 80 ILS = 6,400 ILS; unaccepted 20 m² × 80 ILS = 1,600 ILS.
+- Edited performed to 120 m²: displayed 9,600 / 6,400 / 3,200 ILS — visual PASS.
+- Edited accepted to 100 m²: displayed 9,600 / 8,000 / 1,600 ILS — visual PASS.
+- Edited synthetic rate to 90 ILS/m²: displayed 10,800 / 9,000 / 1,800 ILS — visual PASS.
+- The unaccepted-volume warning updated on screenshots. The contract limit remained NOT VERIFIED; calculations do not authorize payment.
+- Scope: only this synthetic scenario and observed interactions. No claim of full finance module acceptance, production readiness, or independent code audit. No program files modified by this documentation update.
+- Workstream B unchanged: Claude trial NOT EXECUTED; OS isolation and licensing NOT VERIFIED; Gate A BLOCKED, CM33 HARD STOP, Agent D BLOCKED, BD-03 STOP.
