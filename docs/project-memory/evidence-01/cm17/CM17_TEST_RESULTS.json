@@ -1,0 +1,269 @@
+{
+  "task": "CM17",
+  "results": [
+    {
+      "id": "ST01 syntax/new module no network/browser storage",
+      "type": "static",
+      "status": "PASS"
+    },
+    {
+      "id": "D01 fsync commit packet audit receipt sequence",
+      "type": "durable commit",
+      "status": "PASS"
+    },
+    {
+      "id": "D02 typed records all14 modules and no financial copy totals",
+      "type": "cross-module integration",
+      "status": "PASS"
+    },
+    {
+      "id": "I01 identical operation id replay one packet",
+      "type": "idempotency",
+      "status": "PASS"
+    },
+    {
+      "id": "I02 payload mismatch rejected",
+      "type": "idempotency",
+      "status": "PASS"
+    },
+    {
+      "id": "C01 stale global CAS rejected",
+      "type": "concurrency",
+      "status": "PASS"
+    },
+    {
+      "id": "C02 stale entity version rejected",
+      "type": "concurrency",
+      "status": "PASS"
+    },
+    {
+      "id": "C03 second process writer lock refused without touching owner",
+      "type": "concurrent writers",
+      "status": "PASS"
+    },
+    {
+      "id": "P01 new process restart exact head audit receipt replay",
+      "type": "separate-process recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "P02 after durable commit lost response restart resolves receipt",
+      "type": "separate-process recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "P03 failure before commit new process original ID retry",
+      "type": "separate-process recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "F_PREPARE",
+      "type": "atomic rollback",
+      "status": "PASS"
+    },
+    {
+      "id": "F_BEFORE_COMMIT",
+      "type": "atomic rollback",
+      "status": "PASS"
+    },
+    {
+      "id": "F03 partial append never confirmed blocks reads",
+      "type": "corruption recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "F04 journal fsync before anchor failure stays recovery required",
+      "type": "corruption recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "J01 damaged final bytes detected",
+      "type": "corruption recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "J_MISSING_audit",
+      "type": "atomic audit receipt",
+      "status": "PASS"
+    },
+    {
+      "id": "J_MISSING_receipt",
+      "type": "atomic audit receipt",
+      "status": "PASS"
+    },
+    {
+      "id": "J04 incorrect version transition refused",
+      "type": "atomic audit receipt",
+      "status": "PASS"
+    },
+    {
+      "id": "J05 valid prefix rollback detected by highwater",
+      "type": "rollback detection",
+      "status": "PASS"
+    },
+    {
+      "id": "CP01 current checkpoint consistent reconstruction",
+      "type": "checkpoint recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "CP02 stale valid checkpoint rebuilds later journal state",
+      "type": "checkpoint recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "CP03 incomplete checkpoint fails closed",
+      "type": "checkpoint recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "TR01 explicit NOT_SUBMITTED no write",
+      "type": "transport",
+      "status": "PASS"
+    },
+    {
+      "id": "TR02 lost response blocks direct retry and new intent until status",
+      "type": "lost-response recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "TR03 denied operation gives REJECTED",
+      "type": "transport",
+      "status": "PASS"
+    },
+    {
+      "id": "A01 unauthorized reads deny",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "A02 read does not inherit write",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "A_FORGED_uid",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "A_FORGED_grants",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "A_FORGED_approval",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "A_SCOPE_companyId",
+      "type": "scope isolation",
+      "status": "PASS"
+    },
+    {
+      "id": "A_SCOPE_projectId",
+      "type": "scope isolation",
+      "status": "PASS"
+    },
+    {
+      "id": "A_SCOPE_buildingId",
+      "type": "scope isolation",
+      "status": "PASS"
+    },
+    {
+      "id": "A09 unknown token no identity trust",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "A10 revoked write does not replay",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "A11 revoke immediately before commit refuses atomic packet",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "A12 own-chain check and approve denied",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "A13 independent engineer verify approve require distinct grants",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "A14 financial decision independent from write",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "A15 payment evidence cannot assert verified payment",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "L01 unknown source fail closed",
+      "type": "source validation",
+      "status": "PASS"
+    },
+    {
+      "id": "L02 stale link version refused",
+      "type": "cross-module integration",
+      "status": "PASS"
+    },
+    {
+      "id": "L03 inconsistent source modules require reconciliation",
+      "type": "cross-module integration",
+      "status": "PASS"
+    },
+    {
+      "id": "L04 changed task makes old module ref stale",
+      "type": "cross-module integration",
+      "status": "PASS"
+    },
+    {
+      "id": "PM01 corrections immutable historical events retained",
+      "type": "Project Memory",
+      "status": "PASS"
+    },
+    {
+      "id": "PM02 AI assumption never becomes verified fact",
+      "type": "Project Memory",
+      "status": "PASS"
+    },
+    {
+      "id": "B01 consistent backup restores isolated new physical run",
+      "type": "backup restore",
+      "status": "PASS"
+    },
+    {
+      "id": "B02 corrupt backup refused before restore directory",
+      "type": "backup restore",
+      "status": "PASS"
+    },
+    {
+      "id": "B03 backup expected newer head detects rollback",
+      "type": "backup restore",
+      "status": "PASS"
+    },
+    {
+      "id": "B04 cross scope restore forbidden",
+      "type": "scope isolation",
+      "status": "PASS"
+    },
+    {
+      "id": "SAFE01 no automatic payment legal acceptance contract source writes",
+      "type": "safety boundary",
+      "status": "PASS"
+    }
+  ],
+  "pass": 52,
+  "fail": 0,
+  "securityStop": false,
+  "powerLoss": "POWER_LOSS_NOT_PROVEN"
+}

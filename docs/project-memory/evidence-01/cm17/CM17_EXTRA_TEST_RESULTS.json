@@ -1,0 +1,117 @@
+{
+  "results": [
+    {
+      "id": "UI01 local resource/defer/CSP/no direct disk UI",
+      "type": "static",
+      "status": "PASS"
+    },
+    {
+      "id": "UI02 nine sections no raw technical JSON",
+      "type": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "UI03 RU HE AR EN and direction",
+      "type": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "UI04 actual confirmed version journal audit receipts",
+      "type": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "UI05 restart lost response backup evidence cards",
+      "type": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "UI06 Memory class and source links preserved",
+      "type": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "UI07 F5 export reload is not browser persistence",
+      "type": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "UI08 blocked gates visible",
+      "type": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "EX01 unauthorized restore denied before any directory creation",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "EX02 successful restore replays original actor receipt",
+      "type": "backup restore",
+      "status": "PASS"
+    },
+    {
+      "id": "EX03 ambiguous null client building denied",
+      "type": "scope isolation",
+      "status": "PASS"
+    },
+    {
+      "id": "EX04 record client scope fields closed DTO refused",
+      "type": "scope isolation",
+      "status": "PASS"
+    },
+    {
+      "id": "EX05 read has no event audit receipt write",
+      "type": "no-write model",
+      "status": "PASS"
+    },
+    {
+      "id": "EX06 payment evidence privilege not inherited by finance",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "EX07 source immutable catalog corrupt denied on reopen",
+      "type": "source validation",
+      "status": "PASS"
+    },
+    {
+      "id": "EX08 source reference unavailable module mismatch no convenient value",
+      "type": "cross-module integration",
+      "status": "PASS"
+    },
+    {
+      "id": "EX09 oversize note rejected without truncation",
+      "type": "limits",
+      "status": "PASS"
+    },
+    {
+      "id": "EX10 server versions and authors never from record payload",
+      "type": "authorization",
+      "status": "PASS"
+    },
+    {
+      "id": "EX11 wrong known module cannot supply work verification",
+      "type": "source validation",
+      "status": "PASS"
+    },
+    {
+      "id": "EX12 captured sources durable content hash without origin reads",
+      "type": "source persistence",
+      "status": "PASS"
+    },
+    {
+      "id": "EX13 restored captured bytes hash independently matches source refs",
+      "type": "backup restore",
+      "status": "PASS"
+    },
+    {
+      "id": "EX14 captured source blob damage denies read and confirmation",
+      "type": "corruption recovery",
+      "status": "PASS"
+    }
+  ],
+  "pass": 22,
+  "fail": 0,
+  "securityStop": false
+}

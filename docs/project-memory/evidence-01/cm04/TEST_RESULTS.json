@@ -1,0 +1,753 @@
+{
+  "task": "CM04",
+  "results": [
+    {
+      "id": "S01 syntax",
+      "method": "static",
+      "status": "PASS"
+    },
+    {
+      "id": "S02 local resources and unique IDs",
+      "method": "static",
+      "status": "PASS"
+    },
+    {
+      "id": "S03 no network/storage/SDK in executed scripts",
+      "method": "static",
+      "status": "PASS"
+    },
+    {
+      "id": "S04 existing design/Safety retained",
+      "method": "static",
+      "status": "PASS"
+    },
+    {
+      "id": "U01 linked full construction workflow",
+      "method": "synthetic workflow",
+      "status": "PASS"
+    },
+    {
+      "id": "U02 identity scope all levels isolated",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U03 invalid scope denies",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U04 immutable document versions CAS stale references",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U05 history cannot silently delete",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U06 contractor replacement separate histories",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U07 nine document types legal validity unknown",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U08 FACT CLAIM AI SUGGESTION distinction",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U09 own-chain check and acceptance forbidden",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U10 resolution independence and major blocker",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U11 correction history old basis cannot pass",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U12 percent and invalid data no insertion",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U13 exact apartment references and all six relations",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U14 no unverified source task creation",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "D01 full UI workflow and explicit DEMO provenance",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "D02 scope change clears UI selections and reveals no prior records",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "D03 RU HE AR EN RTL/LTR and source unchanged",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "D04 own work refusal visible",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "D05 source escaped and fresh load empty/no server",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "D06 return to exact scope preserves RAM history and can select record",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "U15 stale acceptance warning preserves original note",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "U16 new issue after decision warns without lifecycle change",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "D07 manual negative check cannot produce positive decision",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "D08 contractor selection and replacement retains original",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "F01 first architectural registration and exact version approval",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "F02 repeated current approval creates no hidden event",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "F03 stale ID and wrong expected version still denied",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "F04 two same stale requests preserve conflict and events",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "F05 historical choice explained and explicit fresh read no writes",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "F06 forced double click and registration intent do not duplicate",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "F07 new revision requires another explicit review",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "F08 readable multilingual cards not JSON/source translation",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "F09 historical versions displayed on explicit request",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "F10 card data safely escaped and missing author cannot replay",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "F11 AI hypothesis and local FACT event remain separate",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q01 item and immutable history",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q02 partial accepted and defect quantity",
+      "method": "synthetic workflow",
+      "status": "PASS"
+    },
+    {
+      "id": "Q03 reject requires reason",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q04 replay same request no hidden event",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q05 CAS and invalid rollback",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q06 negative precision overrun boundaries",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q07 replacement separates newwork repair liability",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q08 price components explicit rates",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q09 rounding exact half cent",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q10 all scope dimensions and cross refs",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q11 duplicate cumulative acceptance denied",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q12 shared volume cannot counted in another item",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q13 adjustment event and PM exact references",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q14 UI scenario languages scope and Safety",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "Q15 manual UI inputs create claim measure accept",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "Q16 financial inputs fail closed",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "Q17 repeated UI registration intent no duplicate",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "Q18 PM measurement and decision classification",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W01 exact checked document/work WBS link",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W02 documents never own progress percentage",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W03 raw unverified document blocks work creation",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W04 wrong document version/type denies",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W05 stale source after revision locks mutation and calc",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W06 acceptance before measurement is refused",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W07 new claim supersedes exact measurement basis",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W08 independent engineer and own claim chain guard",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W09 open issues cannot be overwritten or bypassed",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W10 claim CAS and receipt replay no hidden duplicate",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W11 duplicate acceptance no double accounting",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W12 complete 105/85/10 separate linked scenario",
+      "method": "synthetic workflow",
+      "status": "PASS"
+    },
+    {
+      "id": "W13 replacement capacity bound cannot double allocate",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W14 original A quantities cannot mutate after replacement",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W15 currencies not mixed and no payment API",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W16 accepted price calculation and explicit null conditions",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W17 conditions explicit zero and historical calc immutable",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W18 source/author/date/version/event/object links retained",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W19 tenant hierarchy exact all five dimensions",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W20 exact reference foreign document/contract refused",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W21 WORK_ITEM closed payloads and wrong quantity",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W22 invalid create validation leaves no orphan PM records",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W23 RAM creation rollback on second record clock failure",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "W24 source data safely escaped in work/card",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "W25 actual HTML all runtime scripts defer correct order",
+      "method": "static",
+      "status": "PASS"
+    },
+    {
+      "id": "W26 six screens and responsive logical CSS",
+      "method": "static",
+      "status": "PASS"
+    },
+    {
+      "id": "W27 integrated no network/storage/SDK",
+      "method": "static",
+      "status": "PASS"
+    },
+    {
+      "id": "W28 UI full scenario and repeat no hidden duplicates",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "W29 UI language RTL/LTR and original provenance unchanged",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "W30 scope change clears work documents finance and history",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "W31 UI manual document registration review repeat intent",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "W32 UI forced stale review still refused",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "W33 UI history selected remains readable across languages",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "W34 no self engineer or payment buttons activated",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "W35 UI contract and party filters isolate quantities",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "W36 accepted repair never transfers to newwork area",
+      "method": "synthetic workflow",
+      "status": "PASS"
+    },
+    {
+      "id": "W37 integrated manual end-to-end forms and calculation",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "W38 new doc revision double click keeps one revision event",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "W39 isolated B consideration does not subtract A history",
+      "method": "synthetic workflow",
+      "status": "PASS"
+    },
+    {
+      "id": "W40 visible shared engineer fields not hidden inside other screen",
+      "method": "static",
+      "status": "PASS"
+    },
+    {
+      "id": "C01 SHA256 vectors UTF8 and canonical order",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C02 unsupported data unicode cycles fail closed",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C03 event audit receipt one bundle and exact original refs",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C04 immutable document history and EVENT_VERSION chain",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C05 stale expected version writes nothing",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C06 idempotent operation and conflicting repeat",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C07 same source with new operation cannot duplicate",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C08 failure before append no business audit or receipt persisted",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C09 unknown outcome replay exact original receipt",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C10 partial append is ERROR and cannot silently trim",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C11 corruption hash detects changed source",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C12 checkpoint detects complete truncated tail",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C13 checkpoint mutation refused and scope bound",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C14 replay to read-only 105/85/10 projection",
+      "method": "synthetic workflow",
+      "status": "PASS"
+    },
+    {
+      "id": "C15 post-checkpoint replay retains financial source versions",
+      "method": "synthetic workflow",
+      "status": "PASS"
+    },
+    {
+      "id": "C16 damaged same-hash semantic cross-scope link refused",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C17 dangling authoritative link before append no partial write",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C18 disk save close reopen fresh Node process",
+      "method": "local file recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "C19 disk unknown outcome then reopen durable receipt",
+      "method": "local file recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "C20 disk partial write preserved ERROR evidence",
+      "method": "local file recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "C21 exclusive fixture lock ownership and paths",
+      "method": "local file recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "C22 scope-only read/write no foreign metadata",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C23 independent fixture read/write capability gates",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C24 gate revocation precedes receipt replay",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C25 actor/UID injection rejected request schema",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "A01 default deny and server-model identity source",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "A02 approved dossier union all five independent grants",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "A03 read does not inherit report or confirm",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "A04 write does not inherit dossier read",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "A05 actor/engineer/permission injection denied",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "A06 tenant project building task exact binding",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "A07 revoke expiry identity and membership checked anew",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "A08 own chain confirmation no exception",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "A09 unknown operation token and empty owner rights refused",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C26 UI RAM status linked journal and scoped receipts",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "C27 UI RAM checkpoint replay read-only 105/85/10",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "C28 UI injected failure retry no hidden duplicate",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "C29 UI corrupted copy leaves original history intact",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "C30 UI language RTL/LTR origin unchanged",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "C31 UI scope clears old history and fresh environment empty",
+      "method": "DOM mock",
+      "status": "PASS"
+    },
+    {
+      "id": "C32 browser storage absent and file adapter not in HTML",
+      "method": "static",
+      "status": "PASS"
+    },
+    {
+      "id": "C33 checkpoint proof boundary explicitly not full future history",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C34 property order is not tenant identity",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C35 final synthetic gate revoke before append no write",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C36 identity change in final synthetic gate no write",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C37 append record budget no silent truncation",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C38 disk recovery rejects malformed UTF8 and preserves bytes",
+      "method": "local file recovery",
+      "status": "PASS"
+    },
+    {
+      "id": "C39 AI suggestion remains unconfirmed after durable journal capture",
+      "method": "unit",
+      "status": "PASS"
+    },
+    {
+      "id": "C40 forged stored quantity reference version rejected even rehashed",
+      "method": "unit",
+      "status": "PASS"
+    }
+  ],
+  "executed": 146,
+  "pass": 146,
+  "fail": 0,
+  "methods": {
+    "static": 9,
+    "unit": 91,
+    "synthetic workflow": 7,
+    "DOM mock": 34,
+    "local file recovery": 5
+  },
+  "browser": "NOT RUN / BLOCKED",
+  "nativeSDK": "NOT RUN",
+  "server": "NOT RUN / BLOCKED",
+  "productionSecurity": "NOT PROVEN",
+  "networkRequests": 0,
+  "productionBusinessWrites": 0,
+  "syntheticFixtureWrites": "EXECUTED — RESOURCE_MANIFEST.json",
+  "storage": "RAM UI + NODE FS SYNTHETIC FIXTURES"
+}
